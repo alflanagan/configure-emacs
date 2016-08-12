@@ -1,0 +1,43 @@
+# Emacs Initialization and Setup
+
+## A Primer And Example
+
+### Introduction
+
+Emacs is a great editor. Actually, it is the One True Editor, the
+Platonic ideal of which all other editors are imperfect shadows.
+
+#+begin_src emacs-lisp
+  (defun setup-use-package ()
+    "Initialize package system, install `use-package' if not present."
+    ;; should have been initialized already, but in case
+    (if (not (fboundp 'package-install))
+        (progn (require 'package)
+               (package-initialize)))
+    
+    ;; install use-package macro if not already present
+    (if (not (package-installed-p 'use-package '(2 2)))
+        (package-install 'use-package)))
+
+  (defun install-other-packages ()
+    "Use `use-package' to install other desired packages."
+
+    ;; GNU Hyperbole: The Everyday Hypertextual Information Manager
+    (use-package 'hyperbole               
+      :ensure t ;; if it's not installed, install it
+      :bind (([C-M-return] . assist-key)
+             ("\C-h h" #'hyperbole)))
+    ;; \C-h h should be bound by package, but...
+
+    ;; Manage and navigate projects in Emacs easily
+    (use-package 'projectile
+      :ensure t
+      :config (projectile-global-mode)))
+
+  (defun setup-everything ()
+    "Master setup function, runs all the others."
+    (setup-use-package)
+    (install-other-packages))
+
+  (add-hook 'after-init-hook 'setup-everything)
+#+end_src
