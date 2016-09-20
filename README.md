@@ -1,17 +1,17 @@
-# Emacs Custom Configuration
+# Modular Emacs Startup Scripts
 
-Now that I've grown more familiar with Emacs, and found some really useful packages, I'm ready to replace the hacked-up version of "Emacs 24 Starter Kit" I had been using with my own customization system.
+There have been a number of attempts to make the Emacs experience easier for new users. There have also been various utilities to make setting up an Emacs configuration easier for experienced users.
+
+This project aims to achieve both goals.
+
+It is largely inspired by the now-deprecated "Emacs Starter Kit" projects, and the [Emacs 24 Starter Kit](https://eschulte.github.io/emacs24-starter-kit/).
 
 Goals are:
 
-1. Simplify the initialization code to just what I use, and leave out
-   a lot of obsolete code for the starter kit.
+1. Break initialization into 2 parts.
 
-2. Produce a set of initialization files which are both useful to me,
-   and useful to new-ish users of Emacs looking for an example
-   configuration setup to learn from.
+   1. The first would include the essential infrastructure for finding and installing third-party packages, and configuration variables to enable/disable modules, and create local customizable copies for users. 
+   
+   2. The second part is the modules themselves. Each one is focused on a narrow set of tasks, such as setting up a particular mode or handling a particular file extension.
 
-   a. The aim is not so much to have the user install this as their
-      Emacs configuration (though I suppose they could), as to empower
-      him or her to create their own customization files that are
-      powerful yet easy to understand.
+2. Use .org files and literate programming to extensively document both the infrastructure and the modules. This is crucial to making the project useful for newcomers.
