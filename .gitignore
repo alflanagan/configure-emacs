@@ -1,0 +1,7 @@
+elpa
+*~
+network-security.data
+*.elc
+custom.el
+secret-data.el
+configure-emacs.el
