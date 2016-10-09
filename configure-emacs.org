@@ -7,37 +7,75 @@
 Emacs is a great editor. Actually, it is the One True Editor, the
 Platonic ideal of which all other editors are imperfect shadows.
 
+#### say "hello"
 #+begin_src emacs-lisp
-  (defun setup-use-package ()
-    "Initialize package system, install `use-package' if not present."
-    ;; should have been initialized already, but in case
-    (if (not (fboundp 'package-install))
-        (progn (require 'package)
-               (package-initialize)))
-    
-    ;; install use-package macro if not already present
-    (if (not (package-installed-p 'use-package '(2 2)))
-        (package-install 'use-package)))
+  (message "loaded configure-emacs")
+#+end_src
 
+#+begin_src emacs-lisp
   (defun install-other-packages ()
     "Use `use-package' to install other desired packages."
 
     ;; GNU Hyperbole: The Everyday Hypertextual Information Manager
-    (use-package 'hyperbole               
+    (use-package "hyperbole"
       :ensure t ;; if it's not installed, install it
       :bind (([C-M-return] . assist-key)
-             ("\C-h h" #'hyperbole)))
+	     ;;("\C-h h" #'hyperbole)
+	     ))
     ;; \C-h h should be bound by package, but...
 
     ;; Manage and navigate projects in Emacs easily
-    (use-package 'projectile
+    (use-package "projectile"
       :ensure t
-      :config (projectile-global-mode)))
+      :config (projectile-mode))
 
-  (defun setup-everything ()
-    "Master setup function, runs all the others."
-    (setup-use-package)
-    (install-other-packages))
+    ;; projectile-speedbar requires sr-speedbar
+    ;; which appears to be broken, dammit
+    ;; (use-package "projectile-speedbar"
+    ;;   :ensure t)
 
-  (add-hook 'after-init-hook 'setup-everything)
+    (use-package "async"
+      :ensure t)
+
+    (use-package "org"
+      :ensure t)
+
+    (use-package "paradox"
+      :ensure t)
+
+    (use-package "shrink-whitespace"
+      :ensure t)
+
+    (use-package "undo-tree"
+      :ensure t)
+
+    (use-package "elpy"
+      :ensure t)
+
+    (use-package "jedi"
+      :ensure t)
+
+    (use-package "js2-mode"
+      :ensure t)
+
+    (use-package "web-mode"
+      :ensure t)
+
+    (use-package "web-beautify"
+      :ensure t)
+
+    (use-package "smartparens"
+      :ensure t)
+
+    (use-package "flx-ido"
+      :ensure t)
+
+    (use-package "magit"
+      :ensure t)
+
+    (use-package "flycheck-pyflakes"
+      :ensure t)
+    )
+
+  (install-other-packages)
 #+end_src
