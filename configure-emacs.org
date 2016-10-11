@@ -65,7 +65,15 @@ Platonic ideal of which all other editors are imperfect shadows.
       :ensure t)
 
     (use-package "smartparens"
-      :ensure t)
+      :ensure t
+      :config (lambda ()
+		(defun turn-on-smartparens ()
+		  (smartparens-mode +1)
+		  ;; also emulate paredit's refusal to delete one delimiter in a pair
+		  (smartparens-strict-mode +1)
+		  ;; I find paredit bindings more convenient w/PC keyboards
+		  (sp-use-paredit-bindings))
+		(add-hook 'lisp-mode-hook 'turn-on-smartparens)))
 
     (use-package "flx-ido"
       :ensure t)
@@ -75,7 +83,99 @@ Platonic ideal of which all other editors are imperfect shadows.
 
     (use-package "flycheck-pyflakes"
       :ensure t)
+
+    (use-package "slime"
+      :ensure t)
+
+    (use-package "form-feed"
+      :ensure t
+      :config (lambda ()
+		(defun form-feed-turn-on ()
+		  (form-feed-mode 1))
+		(add-hook 'emacs-lisp-mode-hook #'form-feed-turn-on)))
+
     )
 
+
+
+  (define-key lisp-mode-shared-map (kbd "C-\\") 'completion-at-point)
+  (define-key lisp-mode-shared-map (kbd "C-c v") 'eval-buffer)
+
   (install-other-packages)
+#+end_src
+
+** Use regex searches by default.
+#+begin_src emacs-lisp
+(global-set-key (kbd "C-s") 'isearch-forward-regexp)
+(global-set-key (kbd "\C-r") 'isearch-backward-regexp)
+(global-set-key (kbd "C-M-s") 'isearch-forward)
+(global-set-key (kbd "C-M-r") 'isearch-backward)
+#+end_src
+
+
+** Rgrep
+Rgrep is infinitely useful in multi-file projects.
+
+(see [[elisp:(describe-function 'rgrep)]])
+
+#+begin_src emacs-lisp
+  (define-key global-map "\C-x\C-r" 'rgrep)
+#+end_src
+
+** Load secret data
+
+I have a small module to separate sensitive data into a hidden
+fihle. Load that module and read the data to set global variable.
+
+#+begin_src emacs-lisp
+  (org-babel-load-file "secret-data.org" t)
+#+end_src
+
+** Set up org-babel supported languages
+
+#+begin_src emacs-lisp
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((C . t)
+     (clojure . t)
+     (css . t)
+     (emacs-lisp . t)
+     (js . t)
+     (lisp . t)
+     (org . t)
+     (python . t)
+     (R . t)
+     (ruby . t)
+     (sass . t)
+     (scheme . t)
+     (sh . t)
+     (sql . t)))
+#+end_src
+
+** Emacs Lisp
+   :PROPERTIES:
+   :CUSTOM_ID: emacs-lisp
+   :END:
+
+*** Cleanup function for .elc files
+#+begin_src emacs-lisp
+  (defun starter-kit-remove-elc-on-save ()
+    "If you're saving an elisp file, likely the .elc is no longer valid."
+    (make-local-variable 'after-save-hook)
+    (add-hook 'after-save-hook
+	      (lambda ()
+		(if (file-exists-p (concat buffer-file-name "c"))
+		    (delete-file (concat buffer-file-name "c"))))))
+#+end_src
+
+*** emacs-list-mode-hook
+#+begin_src emacs-lisp
+  (add-hook 'emacs-lisp-mode-hook (lambda () (eldoc-mode +1)))
+  (add-hook 'emacs-lisp-mode-hook #'starter-kit-remove-elc-on-save)
+
+  ;; (define-key emacs-lisp-mode-map (kbd "C-c v") #'eval-buffer)
+  ;; for indentation, use spaces, not tabs
+  (defun turn-off-indent-tabs ()
+    (setq indent-tabs-mode nil))
+  (add-hook 'emacs-lisp-mode-hook #'turn-off-indent-tabs)
 #+end_src

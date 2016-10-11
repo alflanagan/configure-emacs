@@ -42,5 +42,7 @@
           ;; source code from a file containing text and source code.
 	  `(lambda ()
 	     (require 'org)
-	     (org-babel-load-file (expand-file-name "configure-emacs.org" user-emacs-directory)))
+	     (org-babel-load-file
+	      (expand-file-name "configure-emacs.org" user-emacs-directory)
+	      t))
 	  t)
