@@ -20,7 +20,7 @@ Platonic ideal of which all other editors are imperfect shadows.
     (use-package "hyperbole"
       :ensure t ;; if it's not installed, install it
       :bind (([C-M-return] . assist-key)
-             (("C-h h") . #'hyperbole)
+             (("\C-hh") . #'hyperbole)
              ))
     ;; \C-h h should be bound by package, but...
 
@@ -104,10 +104,10 @@ Platonic ideal of which all other editors are imperfect shadows.
 
 ** Use regex searches by default.
 #+begin_src emacs-lisp
-(global-set-key (kbd "C-s") 'isearch-forward-regexp)
-(global-set-key (kbd "\C-r") 'isearch-backward-regexp)
-(global-set-key (kbd "C-M-s") 'isearch-forward)
-(global-set-key (kbd "C-M-r") 'isearch-backward)
+  (global-set-key "\C-s" 'isearch-forward-regexp)
+  (global-set-key "\C-r" 'isearch-backward-regexp)
+  (global-set-key "\C-\M-s" 'isearch-forward)
+  (global-set-key "\C-\M-r" 'isearch-backward)
 #+end_src
 
 ** Rgrep
@@ -181,12 +181,18 @@ fihle. Load that module and read the data to set global variable.
 
 #+begin_src emacs-lisp
   (defun emess-local-column-number-mode ()
+    "Enable column-number-mode in local buffer."
     (make-local-variable 'column-number-mode)
     (column-number-mode t))
 
   (defun emess-local-comment-auto-fill ()
+    "Enable local comment-only auto-fill in the current buffer."
     (set (make-local-variable 'comment-auto-fill-only-comments) t)
     (auto-fill-mode t))
+
+  (defun emess-turn-on-undo-tree ()
+    "Turn on undo-tree-mode."
+    (undo-tree-mode 1))
 
   (add-hook 'emess-coding-hook #'emess-local-column-number-mode)
   (add-hook 'emess-coding-hook #'emess-local-comment-auto-fill)
