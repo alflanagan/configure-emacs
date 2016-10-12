@@ -13,15 +13,15 @@ Platonic ideal of which all other editors are imperfect shadows.
 #+end_src
 
 #+begin_src emacs-lisp
-  (defun install-other-packages ()
+  (defun emess-install-other-packages ()
     "Use `use-package' to install other desired packages."
 
     ;; GNU Hyperbole: The Everyday Hypertextual Information Manager
     (use-package "hyperbole"
       :ensure t ;; if it's not installed, install it
       :bind (([C-M-return] . assist-key)
-	     ;;("\C-h h" #'hyperbole)
-	     ))
+             (("C-h h") . #'hyperbole)
+             ))
     ;; \C-h h should be bound by package, but...
 
     ;; Manage and navigate projects in Emacs easily
@@ -67,13 +67,13 @@ Platonic ideal of which all other editors are imperfect shadows.
     (use-package "smartparens"
       :ensure t
       :config (lambda ()
-		(defun turn-on-smartparens ()
-		  (smartparens-mode +1)
-		  ;; also emulate paredit's refusal to delete one delimiter in a pair
-		  (smartparens-strict-mode +1)
-		  ;; I find paredit bindings more convenient w/PC keyboards
-		  (sp-use-paredit-bindings))
-		(add-hook 'lisp-mode-hook 'turn-on-smartparens)))
+                (defun emess-turn-on-smartparens ()
+                  (smartparens-mode +1)
+                  ;; also emulate paredit's refusal to delete one delimiter in a pair
+                  (smartparens-strict-mode +1)
+                  ;; I find paredit bindings more convenient w/PC keyboards
+                  (sp-use-paredit-bindings))
+                (add-hook 'lisp-mode-hook 'emess-turn-on-smartparens)))
 
     (use-package "flx-ido"
       :ensure t)
@@ -90,18 +90,16 @@ Platonic ideal of which all other editors are imperfect shadows.
     (use-package "form-feed"
       :ensure t
       :config (lambda ()
-		(defun form-feed-turn-on ()
-		  (form-feed-mode 1))
-		(add-hook 'emacs-lisp-mode-hook #'form-feed-turn-on)))
+                (defun emess-form-feed-turn-on ()
+                  (form-feed-mode 1))
+                (add-hook 'emacs-lisp-mode-hook #'emess-form-feed-turn-on)))
 
     )
-
-
 
   (define-key lisp-mode-shared-map (kbd "C-\\") 'completion-at-point)
   (define-key lisp-mode-shared-map (kbd "C-c v") 'eval-buffer)
 
-  (install-other-packages)
+  (emess-install-other-packages)
 #+end_src
 
 ** Use regex searches by default.
@@ -111,7 +109,6 @@ Platonic ideal of which all other editors are imperfect shadows.
 (global-set-key (kbd "C-M-s") 'isearch-forward)
 (global-set-key (kbd "C-M-r") 'isearch-backward)
 #+end_src
-
 
 ** Rgrep
 Rgrep is infinitely useful in multi-file projects.
@@ -159,7 +156,7 @@ fihle. Load that module and read the data to set global variable.
 
 *** Cleanup function for .elc files
 #+begin_src emacs-lisp
-  (defun starter-kit-remove-elc-on-save ()
+  (defun emess-remove-elc-on-save ()
     "If you're saving an elisp file, likely the .elc is no longer valid."
     (make-local-variable 'after-save-hook)
     (add-hook 'after-save-hook
@@ -171,11 +168,31 @@ fihle. Load that module and read the data to set global variable.
 *** emacs-list-mode-hook
 #+begin_src emacs-lisp
   (add-hook 'emacs-lisp-mode-hook (lambda () (eldoc-mode +1)))
-  (add-hook 'emacs-lisp-mode-hook #'starter-kit-remove-elc-on-save)
+  (add-hook 'emacs-lisp-mode-hook #'emess-remove-elc-on-save)
 
   ;; (define-key emacs-lisp-mode-map (kbd "C-c v") #'eval-buffer)
   ;; for indentation, use spaces, not tabs
-  (defun turn-off-indent-tabs ()
+  (defun emess-turn-off-indent-tabs ()
     (setq indent-tabs-mode nil))
-  (add-hook 'emacs-lisp-mode-hook #'turn-off-indent-tabs)
+  (add-hook 'emacs-lisp-mode-hook #'emess-turn-off-indent-tabs)
+#+end_src
+
+** Configuration for each buffer
+
+#+begin_src emacs-lisp
+  (defun emess-local-column-number-mode ()
+    (make-local-variable 'column-number-mode)
+    (column-number-mode t))
+
+  (defun emess-local-comment-auto-fill ()
+    (set (make-local-variable 'comment-auto-fill-only-comments) t)
+    (auto-fill-mode t))
+
+  (add-hook 'emess-coding-hook #'emess-local-column-number-mode)
+  (add-hook 'emess-coding-hook #'emess-local-comment-auto-fill)
+
+  (defun emess-run-coding-hook ()
+    "Enable things that are convenient across all coding buffers."
+    (run-hooks 'emess-coding-hook))
+
 #+end_src
