@@ -1,0 +1,71 @@
+#+TITLE: Better Emacs Defaults
+#+OPTIONS: toc:nil num:nil ^:nil
+
+Set up global Emacs options to replace Emacs defaults with "better"
+behavior. Some of this is from the Emacs Starter Kit.
+
+** Window systems -- remove visual cruft                             :visual:
+   :PROPERTIES:
+   :CUSTOM_ID: window-system
+   :END:
+
+You don't need a tool bar or menus; learn to use help (ctrl-h)
+functions, etc. to get keystrokes, put them in your muscle memory,
+it's *much* faster.
+
+#+name: emess-cleanup-frames
+#+begin_src emacs-lisp
+(when window-system
+  (menu-bar-mode -1)
+  (tool-bar-mode -1))
+#+end_src
+
+** Set browser
+Set this to whatever browser you use e.g...
+: ;; (setq browse-url-browser-function 'browse-url-firefox)
+: ;; (setq browse-url-browser-function 'browse-default-macosx-browser)
+: ;; (setq browse-url-browser-function 'browse-default-windows-browser)
+: ;; (setq browse-url-browser-function 'browse-default-kde)
+: ;; (setq browse-url-browser-function 'browse-default-epiphany)
+: ;; (setq browse-url-browser-function 'browse-default-w3m)
+: ;; (setq browse-url-browser-function 'browse-url-generic
+: ;;       browse-url-generic-program "conkeror")
+#+begin_src emacs-lisp
+  (setq browse-url-browser-function 'browse-url-firefox)
+#+end_src
+
+** Fix cursor
+Holy cow, that blinking cursor gets old quick. Plus on my current window system it makes some decorations blink as well.
+
+#+begin_src emacs-lisp
+    (blink-cursor-mode -1)
+#+end_src
+
+** Coding systems
+Emacs supports many, many different coding systems (mappings from
+integers to characters). Unicode is the modern standard that promises
+to encompass all characters, and 'UTF-8' is the most common Unicode
+encoding. So select it by default whenever possible.
+
+#+begin_src emacs-lisp
+  (set-terminal-coding-system 'utf-8)
+  (set-keyboard-coding-system 'utf-8)
+  (prefer-coding-system 'utf-8)
+#+end_src
+
+** Various global settings
+
+#+begin_src emacs-lisp
+  (setq visible-bell t                      ;; try to flash the frame when a bell (warning beep) would sound.
+	echo-keystrokes 0.1                 ;; reduce lag in echo keystroke to screen
+	font-lock-maximum-decoration t      ;; use as much syntax highlighting as possible, by default
+	;; inhibit-startup-message t        ;; turn off Emacs splash screen
+	transient-mark-mode t               ;; visually highlight selected region
+	delete-by-moving-to-trash t         ;; use system trash can for deleted files
+	;; shift-select-mode nil            ;; disable selecting text by shift + motion command
+	truncate-partial-width-windows nil  ;; use value of `truncate_lines' even in windows narrower than frame
+	uniquify-buffer-name-style 'forward ;; label buffers for different files with the same name with enough bof file path to be unique
+	package-menu-hide-low-priority t    ;; don't show package in menu if higher-priority package is found
+	load-prefer-newer t)                ;; don't load .elc file if .el file is newer (well, duh)
+
+#+end_src

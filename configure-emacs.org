@@ -50,19 +50,29 @@ Platonic ideal of which all other editors are imperfect shadows.
       :ensure t)
 
     (use-package "elpy"
-      :ensure t)
+      :ensure t
+      :defer
+      :config (progn
+                (defun emess-turn-on-elpy-mode ()
+                  (require 'elpy)
+                  (elpy-mode))
+                (add-hook 'python-mode-hook emess-turn-on-elpy-mode)))
 
     (use-package "jedi"
-      :ensure t)
+      :ensure t
+      :defer)
 
     (use-package "js2-mode"
-      :ensure t)
+      :ensure t
+      :defer)
 
     (use-package "web-mode"
-      :ensure t)
+      :ensure t
+      :defer)
 
     (use-package "web-beautify"
-      :ensure t)
+      :ensure t
+      :defer)
 
     (use-package "smartparens"
       :ensure t
@@ -79,7 +89,9 @@ Platonic ideal of which all other editors are imperfect shadows.
       :ensure t)
 
     (use-package "magit"
-      :ensure t)
+      :ensure t
+      :bind ((("\C-xg") . magit-status)
+             (("\C-x\M-g") . magit-dispatch-popup)))
 
     (use-package "flycheck-pyflakes"
       :ensure t)
@@ -92,9 +104,7 @@ Platonic ideal of which all other editors are imperfect shadows.
       :config (lambda ()
                 (defun emess-form-feed-turn-on ()
                   (form-feed-mode 1))
-                (add-hook 'emacs-lisp-mode-hook #'emess-form-feed-turn-on)))
-
-    )
+                (add-hook 'emacs-lisp-mode-hook #'emess-form-feed-turn-on))))
 
   (define-key lisp-mode-shared-map (kbd "C-\\") 'completion-at-point)
   (define-key lisp-mode-shared-map (kbd "C-c v") 'eval-buffer)
@@ -125,7 +135,7 @@ I have a small module to separate sensitive data into a hidden
 fihle. Load that module and read the data to set global variable.
 
 #+begin_src emacs-lisp
-  (org-babel-load-file "secret-data.org" t)
+  (org-babel-load-file "secret-data.org")
 #+end_src
 
 ** Set up org-babel supported languages
@@ -165,7 +175,7 @@ fihle. Load that module and read the data to set global variable.
 		    (delete-file (concat buffer-file-name "c"))))))
 #+end_src
 
-*** emacs-list-mode-hook
+*** emacs-lisp-mode-hook
 #+begin_src emacs-lisp
   (add-hook 'emacs-lisp-mode-hook (lambda () (eldoc-mode +1)))
   (add-hook 'emacs-lisp-mode-hook #'emess-remove-elc-on-save)
@@ -201,4 +211,32 @@ fihle. Load that module and read the data to set global variable.
     "Enable things that are convenient across all coding buffers."
     (run-hooks 'emess-coding-hook))
 
+#+end_src
+** Set up better default behavior
+
+#+begin_src emacs-lisp
+  (org-babel-load-file "better-emacs-defaults.org")
+#+end_src
+** Transparently open compressed files
+#+begin_src emacs-lisp
+  (auto-compression-mode)
+#+end_src
+** Highlight matching parentheses when the point is on them.
+#+srcname: starter-kit-match-parens
+#+begin_src emacs-lisp
+  (show-paren-mode 1)
+#+end_src
+
+
+** ido mode
+Set up ido-mode to add auto-completion to prompts, etc.
+#+begin_src emacs-lisp
+  (when (> emacs-major-version 21)
+    (ido-mode t)
+    (setq ido-enable-prefix nil          ;; allow match to any part of name
+	  ido-enable-flex-matching t     ;; more flexible matches
+	  ido-create-new-buffer 'always  ;; create new buffer if no match?
+	  ido-use-filename-at-point nil  ;; use text at point as starter for filename selection
+	  ;; I find the above more annoying than helpful
+	  ido-max-prospects 10))
 #+end_src
