@@ -17,8 +17,7 @@
         ("elpy" . 20)
         ("gnu" . 10)
         ("melpa" . 0)))
-(setq package-menu-hide-low-priority t)
-(setq load-prefer-newer t)
+
 (setq custom-file (concat user-emacs-directory "custom.el"))
 
 (setq package-selected-packages '(use-package))
@@ -35,14 +34,6 @@
 ;; more crowded.
 (add-to-list 'load-path (expand-file-name (concat user-emacs-directory "src")))
 
-(add-hook 'package--post-download-archives-hook 'package-install-selected-packages)
-
-(add-hook 'package--post-download-archives-hook
-          ;; create an unnamed function that uses Org mode to load
-          ;; source code from a file containing text and source code.
-	  `(lambda ()
-	     (require 'org)
-	     (org-babel-load-file
-	      (expand-file-name "configure-emacs.org" user-emacs-directory)
-	      t))
-	  t)
+(require 'org)
+(org-babel-load-file
+ (expand-file-name "configure-emacs.org" user-emacs-directory))
