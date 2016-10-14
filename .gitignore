@@ -8,3 +8,4 @@ configure-emacs.el
 better-emacs-defaults.el
 ido.last
 local.*
+projectile-bookmarks.*

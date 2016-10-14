@@ -58,9 +58,11 @@ heavy development, leaving it here for now.
     (use-package "hyperbole"
       :ensure t ;; if it's not installed, install it
       :bind (("C-M-RET" . assist-key)
-	     ("C-h h" . hyperbole)))
-    ;; \C-h h should be bound by package, but...
-
+             ("C-h h" . hyperbole))
+      ;; \C-h h should be bound by package, and
+      ;; hyperbole-web-search-alist is missing
+      :config (setq hyperbole-web-search-alist nil))
+    
     ;; Manage and navigate projects in Emacs easily
     (use-package "projectile"
       :ensure t
@@ -80,26 +82,32 @@ heavy development, leaving it here for now.
     (use-package "paradox"
       :ensure t
       :config (setq paradox-github-token
-		    (secret-data-get-key "paradox-github-token")))
+                    (secret-data-get-key "paradox-github-token")))
 
     (use-package "shrink-whitespace"
       :ensure t)
 
     (use-package "undo-tree"
-      :ensure t)
+      :ensure t
+      :config (progn
+                (defun turn-on-undo-tree ()
+                  (undo-tree-mode 1))
+                (message "setting up undo-tree")
+                (add-hook 'prog-mode-hook 'turn-on-undo-tree)
+                (add-hook 'org-mode-hook 'turn-on-undo-tree)))
 
     (use-package "elpy"
       :ensure t
       :defer
       :config (progn
-		(defun emess-turn-on-elpy-mode ()
-		  (require 'elpy)
-		  (setq elpy-modules '(elpy-module-company elpy-module-eldoc elpy-module-flymake elpy-module-pyvenv
-							   elpy-module-yasnippet elpy-module-sane-defaults)
-			elpy-rpc-python-command "python3"
-			pyvenv-virtualenvwrapper-python "/usr/bin/python")
-		  (elpy-mode))
-		(add-hook 'python-mode-hook emess-turn-on-elpy-mode)))
+                (defun emess-turn-on-elpy-mode ()
+                  (require 'elpy)
+                  (setq elpy-modules '(elpy-module-company elpy-module-eldoc elpy-module-flymake elpy-module-pyvenv
+                                                           elpy-module-yasnippet elpy-module-sane-defaults)
+                        elpy-rpc-python-command "python3"
+                        pyvenv-virtualenvwrapper-python "/usr/bin/python")
+                  (elpy-mode))
+                (add-hook 'python-mode-hook 'emess-turn-on-elpy-mode)))
 
     (use-package "jedi"
       :ensure t
@@ -120,13 +128,13 @@ heavy development, leaving it here for now.
     (use-package "smartparens"
       :ensure t
       :config (progn
-		(defun emess-turn-on-smartparens ()
-		  (smartparens-mode +1)
-		  ;; also emulate paredit's refusal to delete one delimiter in a pair
-		  (smartparens-strict-mode +1)
-		  ;; I find paredit bindings more convenient w/PC keyboards
-		  (sp-use-paredit-bindings))
-		(add-hook 'lisp-mode-hook 'emess-turn-on-smartparens)))
+                (defun emess-turn-on-smartparens ()
+                  (smartparens-mode +1)
+                  ;; also emulate paredit's refusal to delete one delimiter in a pair
+                  (smartparens-strict-mode +1)
+                  ;; I find paredit bindings more convenient w/PC keyboards
+                  (sp-use-paredit-bindings))
+                (add-hook 'lisp-mode-hook 'emess-turn-on-smartparens)))
 
     (use-package "flx-ido"
       :ensure t)
@@ -134,7 +142,7 @@ heavy development, leaving it here for now.
     (use-package "magit"
       :ensure t
       :bind (("C-x g" . magit-status)
-	     ("C-x M-g" . magit-dispatch-popup)))
+             ("C-x M-g" . magit-dispatch-popup)))
 
     (use-package "flycheck-pyflakes"
       :ensure t)
@@ -145,16 +153,16 @@ heavy development, leaving it here for now.
     (use-package "form-feed"
       :ensure t
       :config (progn
-		(defun emess-form-feed-turn-on ()
-		  (form-feed-mode 1))
-		(add-hook 'emacs-lisp-mode-hook #'emess-form-feed-turn-on)))
+                (defun emess-form-feed-turn-on ()
+                  (form-feed-mode 1))
+                (add-hook 'emacs-lisp-mode-hook 'emess-form-feed-turn-on)))
 
     (use-package "yasnippet"
       :ensure t
       :config (progn
-		(require 'yasnippet)
-		(yas-global-mode 1)
-		(yas/load-directory (expand-file-name "snippets" user-emacs-directory)))))
+                (require 'yasnippet)
+                (yas-global-mode 1)
+                (yas/load-directory (expand-file-name "snippets" user-emacs-directory)))))
 
   (define-key lisp-mode-shared-map (kbd "C-\\") 'completion-at-point)
   (define-key lisp-mode-shared-map (kbd "C-c v") 'eval-buffer)
@@ -219,13 +227,13 @@ Rgrep is infinitely useful in multi-file projects.
 *** emacs-lisp-mode-hook
 #+begin_src emacs-lisp
   (add-hook 'emacs-lisp-mode-hook (lambda () (eldoc-mode +1)))
-  (add-hook 'emacs-lisp-mode-hook #'emess-remove-elc-on-save)
+  (add-hook 'emacs-lisp-mode-hook 'emess-remove-elc-on-save)
 
   ;; (define-key emacs-lisp-mode-map (kbd "C-c v") #'eval-buffer)
   ;; for indentation, use spaces, not tabs
   (defun emess-turn-off-indent-tabs ()
     (setq indent-tabs-mode nil))
-  (add-hook 'emacs-lisp-mode-hook #'emess-turn-off-indent-tabs)
+  (add-hook 'emacs-lisp-mode-hook 'emess-turn-off-indent-tabs)
 #+end_src
 
 ** Configuration for each buffer
@@ -241,12 +249,8 @@ Rgrep is infinitely useful in multi-file projects.
     (set (make-local-variable 'comment-auto-fill-only-comments) t)
     (auto-fill-mode t))
 
-  (defun emess-turn-on-undo-tree ()
-    "Turn on undo-tree-mode."
-    (undo-tree-mode 1))
-
-  (add-hook 'emess-coding-hook #'emess-local-column-number-mode)
-  (add-hook 'emess-coding-hook #'emess-local-comment-auto-fill)
+  (add-hook 'emess-coding-hook 'emess-local-column-number-mode)
+  (add-hook 'emess-coding-hook 'emess-local-comment-auto-fill)
 
   (defun emess-run-coding-hook ()
     "Enable things that are convenient across all coding buffers."
