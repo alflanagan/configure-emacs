@@ -27,7 +27,8 @@ Platonic ideal of which all other editors are imperfect shadows.
     ;; Manage and navigate projects in Emacs easily
     (use-package "projectile"
       :ensure t
-      :config (projectile-mode))
+      :config (lambda ()
+                (projectile-mode)))
 
     ;; projectile-speedbar requires sr-speedbar
     ;; which appears to be broken, dammit
@@ -52,11 +53,12 @@ Platonic ideal of which all other editors are imperfect shadows.
     (use-package "elpy"
       :ensure t
       :defer
-      :config (progn
-                (defun emess-turn-on-elpy-mode ()
-                  (require 'elpy)
-                  (elpy-mode))
-                (add-hook 'python-mode-hook emess-turn-on-elpy-mode)))
+      :config (lambda ()
+                (progn
+                  (defun emess-turn-on-elpy-mode ()
+                    (require 'elpy)
+                    (elpy-mode))
+                  (add-hook 'python-mode-hook emess-turn-on-elpy-mode))))
 
     (use-package "jedi"
       :ensure t
@@ -239,4 +241,29 @@ Set up ido-mode to add auto-completion to prompts, etc.
 	  ido-use-filename-at-point nil  ;; use text at point as starter for filename selection
 	  ;; I find the above more annoying than helpful
 	  ido-max-prospects 10))
+#+end_src
+** local and user customizations
+
+#+begin_src emacs-lisp
+  ;; more or less straight steal from emacs24-starter-kit (https://eschulte.github.io/emacs24-starter-kit/)
+  (defun emess-load-file (base)
+    "Load file with name `base', checking multiple file extensions"
+    (let* ((path  (expand-file-name base user-emacs-directory))
+           (literate      (concat path ".org"))
+           (encrypted-org (concat path ".org.gpg"))
+           (plain         (concat path ".el"))
+           (encrypted-el  (concat path ".el.gpg")))
+      (cond
+       ((file-exists-p encrypted-org) (org-babel-load-file encrypted-org))
+       ((file-exists-p encrypted-el)  (load encrypted-el))
+       ((file-exists-p literate)      (org-babel-load-file literate))
+       ((file-exists-p plain)         (load plain))
+       (t (message "attempted to load %s, not found" literate)))))
+
+  (defun remove-extension (name)
+    (string-match "\\(.*?\\)\.\\(org\\(\\.el\\)?\\|el\\)\\(\\.gpg\\)?$" name)
+    (match-string 1 name))
+
+  (emess-load-file "local")
+  (emess-load-file user-login-name)
 #+end_src

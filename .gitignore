@@ -6,3 +6,5 @@ custom.el
 secret-data.el
 configure-emacs.el
 better-emacs-defaults.el
+ido.last
+local.el
