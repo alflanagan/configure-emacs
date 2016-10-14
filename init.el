@@ -18,7 +18,7 @@
         ("gnu" . 10)
         ("melpa" . 0)))
 
-(setq custom-file (concat user-emacs-directory "custom.el"))
+(setq custom-file (expand-file-name "custom.el" user-emacs-directory))
 
 (setq package-selected-packages '(use-package))
 
@@ -32,7 +32,7 @@
 
 ;; add an extra directory to load path, so .emacs.d doesn't get even
 ;; more crowded.
-(add-to-list 'load-path (expand-file-name (concat user-emacs-directory "src")))
+(add-to-list 'load-path (expand-file-name "src" user-emacs-directory))
 
 (require 'org)
 (org-babel-load-file

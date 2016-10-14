@@ -137,7 +137,7 @@ I have a small module to separate sensitive data into a hidden
 fihle. Load that module and read the data to set global variable.
 
 #+begin_src emacs-lisp
-  (org-babel-load-file "secret-data.org")
+  (org-babel-load-file (expand-file-name "secret-data.org" user-emacs-directory))
 #+end_src
 
 ** Set up org-babel supported languages
@@ -217,7 +217,7 @@ fihle. Load that module and read the data to set global variable.
 ** Set up better default behavior
 
 #+begin_src emacs-lisp
-  (org-babel-load-file "better-emacs-defaults.org")
+  (org-babel-load-file (expand-file-name "better-emacs-defaults.org" user-emacs-directory))
 #+end_src
 ** Transparently open compressed files
 #+begin_src emacs-lisp
@@ -228,7 +228,6 @@ fihle. Load that module and read the data to set global variable.
 #+begin_src emacs-lisp
   (show-paren-mode 1)
 #+end_src
-
 
 ** ido mode
 Set up ido-mode to add auto-completion to prompts, etc.
