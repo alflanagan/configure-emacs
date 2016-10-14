@@ -1,16 +1,54 @@
 # Emacs Initialization and Setup
 
-## A Primer And Example
+** A Primer And Example
 
-### Introduction
+*** Introduction
 
 Emacs is a great editor. Actually, it is the One True Editor, the
 Platonic ideal of which all other editors are imperfect shadows.
 
-#### say "hello"
+*** say "hello"
 #+begin_src emacs-lisp
   (message "loaded configure-emacs")
 #+end_src
+
+** A function to load files
+
+This is like `load', except that it checks the file extension and does
+the right thing for .org files that have embedded code sections.
+
+#+begin_src emacs-lisp
+  ;; more or less straight steal from emacs24-starter-kit (https://eschulte.github.io/emacs24-starter-kit/)
+  (defun emess-load-file (base)
+    "Load file with name `base', checking multiple file extensions"
+    (let* ((path  (expand-file-name base user-emacs-directory))
+	   (literate      (concat path ".org"))
+	   (encrypted-org (concat path ".org.gpg"))
+	   (plain         (concat path ".el"))
+	   (encrypted-el  (concat path ".el.gpg")))
+      (cond
+       ((file-exists-p encrypted-org) (org-babel-load-file encrypted-org))
+       ((file-exists-p encrypted-el)  (load encrypted-el))
+       ((file-exists-p literate)      (org-babel-load-file literate))
+       ((file-exists-p plain)         (load plain))
+       (t (message "attempted to load %s, not found" literate)))))
+
+#+end_src
+
+** Load secret data
+
+I have a small module to separate sensitive data into a hidden
+fihle. Load that module and read the data to set global variable.
+
+#+begin_src emacs-lisp
+  (emess-load-file (expand-file-name "secret-data" user-emacs-directory))
+#+end_src
+
+** Install external packages
+
+This needs to be broken out into separate files grouping packages that
+are typically used together. Since the initialization code is under
+heavy development, leaving it here for now.
 
 #+begin_src emacs-lisp
   (defun emess-install-other-packages ()
@@ -19,16 +57,14 @@ Platonic ideal of which all other editors are imperfect shadows.
     ;; GNU Hyperbole: The Everyday Hypertextual Information Manager
     (use-package "hyperbole"
       :ensure t ;; if it's not installed, install it
-      :bind (([C-M-return] . assist-key)
-             (("\C-hh") . #'hyperbole)
-             ))
+      :bind (("C-M-RET" . assist-key)
+	     ("C-h h" . hyperbole)))
     ;; \C-h h should be bound by package, but...
 
     ;; Manage and navigate projects in Emacs easily
     (use-package "projectile"
       :ensure t
-      :config (lambda ()
-                (projectile-mode)))
+      :config (projectile-mode))
 
     ;; projectile-speedbar requires sr-speedbar
     ;; which appears to be broken, dammit
@@ -42,7 +78,9 @@ Platonic ideal of which all other editors are imperfect shadows.
       :ensure t)
 
     (use-package "paradox"
-      :ensure t)
+      :ensure t
+      :config (setq paradox-github-token
+		    (secret-data-get-key "paradox-github-token")))
 
     (use-package "shrink-whitespace"
       :ensure t)
@@ -53,12 +91,15 @@ Platonic ideal of which all other editors are imperfect shadows.
     (use-package "elpy"
       :ensure t
       :defer
-      :config (lambda ()
-                (progn
-                  (defun emess-turn-on-elpy-mode ()
-                    (require 'elpy)
-                    (elpy-mode))
-                  (add-hook 'python-mode-hook emess-turn-on-elpy-mode))))
+      :config (progn
+		(defun emess-turn-on-elpy-mode ()
+		  (require 'elpy)
+		  (setq elpy-modules '(elpy-module-company elpy-module-eldoc elpy-module-flymake elpy-module-pyvenv
+							   elpy-module-yasnippet elpy-module-sane-defaults)
+			elpy-rpc-python-command "python3"
+			pyvenv-virtualenvwrapper-python "/usr/bin/python")
+		  (elpy-mode))
+		(add-hook 'python-mode-hook emess-turn-on-elpy-mode)))
 
     (use-package "jedi"
       :ensure t
@@ -78,22 +119,22 @@ Platonic ideal of which all other editors are imperfect shadows.
 
     (use-package "smartparens"
       :ensure t
-      :config (lambda ()
-                (defun emess-turn-on-smartparens ()
-                  (smartparens-mode +1)
-                  ;; also emulate paredit's refusal to delete one delimiter in a pair
-                  (smartparens-strict-mode +1)
-                  ;; I find paredit bindings more convenient w/PC keyboards
-                  (sp-use-paredit-bindings))
-                (add-hook 'lisp-mode-hook 'emess-turn-on-smartparens)))
+      :config (progn
+		(defun emess-turn-on-smartparens ()
+		  (smartparens-mode +1)
+		  ;; also emulate paredit's refusal to delete one delimiter in a pair
+		  (smartparens-strict-mode +1)
+		  ;; I find paredit bindings more convenient w/PC keyboards
+		  (sp-use-paredit-bindings))
+		(add-hook 'lisp-mode-hook 'emess-turn-on-smartparens)))
 
     (use-package "flx-ido"
       :ensure t)
 
     (use-package "magit"
       :ensure t
-      :bind ((("\C-xg") . magit-status)
-             (("\C-x\M-g") . magit-dispatch-popup)))
+      :bind (("C-x g" . magit-status)
+	     ("C-x M-g" . magit-dispatch-popup)))
 
     (use-package "flycheck-pyflakes"
       :ensure t)
@@ -103,10 +144,17 @@ Platonic ideal of which all other editors are imperfect shadows.
 
     (use-package "form-feed"
       :ensure t
-      :config (lambda ()
-                (defun emess-form-feed-turn-on ()
-                  (form-feed-mode 1))
-                (add-hook 'emacs-lisp-mode-hook #'emess-form-feed-turn-on))))
+      :config (progn
+		(defun emess-form-feed-turn-on ()
+		  (form-feed-mode 1))
+		(add-hook 'emacs-lisp-mode-hook #'emess-form-feed-turn-on)))
+
+    (use-package "yasnippet"
+      :ensure t
+      :config (progn
+		(require 'yasnippet)
+		(yas-global-mode 1)
+		(yas/load-directory (expand-file-name "snippets" user-emacs-directory)))))
 
   (define-key lisp-mode-shared-map (kbd "C-\\") 'completion-at-point)
   (define-key lisp-mode-shared-map (kbd "C-c v") 'eval-buffer)
@@ -129,15 +177,6 @@ Rgrep is infinitely useful in multi-file projects.
 
 #+begin_src emacs-lisp
   (define-key global-map "\C-x\C-r" 'rgrep)
-#+end_src
-
-** Load secret data
-
-I have a small module to separate sensitive data into a hidden
-fihle. Load that module and read the data to set global variable.
-
-#+begin_src emacs-lisp
-  (org-babel-load-file (expand-file-name "secret-data.org" user-emacs-directory))
 #+end_src
 
 ** Set up org-babel supported languages
@@ -213,18 +252,19 @@ fihle. Load that module and read the data to set global variable.
     "Enable things that are convenient across all coding buffers."
     (run-hooks 'emess-coding-hook))
 
+  (add-hook 'prog-mode-hook 'emess-run-coding-hook)
 #+end_src
 ** Set up better default behavior
 
 #+begin_src emacs-lisp
-  (org-babel-load-file (expand-file-name "better-emacs-defaults.org" user-emacs-directory))
+  (emess-load-file (expand-file-name "better-emacs-defaults" user-emacs-directory))
 #+end_src
 ** Transparently open compressed files
 #+begin_src emacs-lisp
   (auto-compression-mode)
 #+end_src
 ** Highlight matching parentheses when the point is on them.
-#+srcname: starter-kit-match-parens
+
 #+begin_src emacs-lisp
   (show-paren-mode 1)
 #+end_src
@@ -244,20 +284,6 @@ Set up ido-mode to add auto-completion to prompts, etc.
 ** local and user customizations
 
 #+begin_src emacs-lisp
-  ;; more or less straight steal from emacs24-starter-kit (https://eschulte.github.io/emacs24-starter-kit/)
-  (defun emess-load-file (base)
-    "Load file with name `base', checking multiple file extensions"
-    (let* ((path  (expand-file-name base user-emacs-directory))
-           (literate      (concat path ".org"))
-           (encrypted-org (concat path ".org.gpg"))
-           (plain         (concat path ".el"))
-           (encrypted-el  (concat path ".el.gpg")))
-      (cond
-       ((file-exists-p encrypted-org) (org-babel-load-file encrypted-org))
-       ((file-exists-p encrypted-el)  (load encrypted-el))
-       ((file-exists-p literate)      (org-babel-load-file literate))
-       ((file-exists-p plain)         (load plain))
-       (t (message "attempted to load %s, not found" literate)))))
 
   (defun remove-extension (name)
     (string-match "\\(.*?\\)\.\\(org\\(\\.el\\)?\\|el\\)\\(\\.gpg\\)?$" name)
@@ -265,4 +291,20 @@ Set up ido-mode to add auto-completion to prompts, etc.
 
   (emess-load-file "local")
   (emess-load-file user-login-name)
+#+end_src
+** Enable server mode
+
+This starts a background process running Emacs as a server, so that
+future execution of =emacsclient= will open a buffer in the existing
+Emacs instance, instead of starting a new one.
+
+Note it is also possible to run emacs in pure server mode, with
+
+: emacs --daemon
+
+However, I have had problems with the daemon not being able to open a
+frame.
+
+#+begin_src emacs-lisp
+  (server-start)
 #+end_src
