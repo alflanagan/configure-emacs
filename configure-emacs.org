@@ -122,16 +122,15 @@ heavy development, leaving it here for now.
 
     (use-package "elpy"
       :ensure t
-      :defer
       :config (progn
-                (defun emess-turn-on-elpy-mode ()
-                  (require 'elpy)
+                (defun emess-set-up-elpy ()
                   (setq elpy-modules '(elpy-module-company elpy-module-eldoc elpy-module-flymake elpy-module-pyvenv
                                                            elpy-module-yasnippet elpy-module-sane-defaults)
                         elpy-rpc-python-command "python3"
-                        pyvenv-virtualenvwrapper-python "/usr/bin/python")
-                  (elpy-mode))
-                (add-hook 'python-mode-hook 'emess-turn-on-elpy-mode)))
+                        pyvenv-virtualenvwrapper-python "/usr/bin/python"))
+                (add-hook 'after-init-hook 'emess-set-up-elpy)
+                (add-hook 'python-mode-hook 'elpy-mode)
+                (global-company-mode)))
 
     (use-package "jedi"
       :ensure t
@@ -141,10 +140,11 @@ heavy development, leaving it here for now.
       :ensure t
       :init (progn
               (message "running :init for js-mode!!")
-              (defun emess-fix-js2-interps ()
+              (defun emess-fix-js2-alists ()
                 "Alter setup so that js2-mode is used instead of js-mode."
-                (emess-replace-cdrs interpreter-mode-alist 'js-mode 'js2-mode))
-              (add-hook 'after-init-hook 'emess-fix-js2-interps))
+                (emess-replace-cdrs interpreter-mode-alist 'js-mode 'js2-mode)
+                (emess-replace-cdrs auto-mode-alist 'javascript-mode 'js2-mode))
+              (add-hook 'after-init-hook 'emess-fix-js2-alists))
         :config (progn
                 (message "setting up js2-mode")
                 (message "mode for node interpreter is %s." (assq "node" interpreter-mode-alist))
