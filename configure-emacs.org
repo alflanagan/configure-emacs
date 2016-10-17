@@ -56,6 +56,18 @@ fihle. Load that module and read the data to set global variable.
   (emess-load-file (expand-file-name "secret-data" user-emacs-directory))
 #+end_src
 
+** A useful function
+
+#+begin_src emacs-lisp
+  (defun emess-replace-cdrs (a-list current-value new-value &optional test)
+    "For each element of A-LIST, if cdr is CURRENT-VALUE replace it with NEW-VALUE. Uses `eql' unless TEST is given."
+    (let ((the-test (or test 'eql)))
+      (mapc (lambda (a-cons)
+              (if (funcall the-test (cdr a-cons) current-value)
+                  (setcdr a-cons new-value)))
+            a-list)))
+#+end_src
+
 ** Install external packages
 
 This needs to be broken out into separate files grouping packages that
@@ -127,7 +139,19 @@ heavy development, leaving it here for now.
 
     (use-package "js2-mode"
       :ensure t
-      :defer)
+      :init (progn
+              (message "running :init for js-mode!!")
+              (defun emess-fix-js2-interps ()
+                "Alter setup so that js2-mode is used instead of js-mode."
+                (emess-replace-cdrs interpreter-mode-alist 'js-mode 'js2-mode))
+              (add-hook 'after-init-hook 'emess-fix-js2-interps))
+        :config (progn
+                (message "setting up js2-mode")
+                (message "mode for node interpreter is %s." (assq "node" interpreter-mode-alist))
+                (setq js2-include-node-externs t
+                      js2-skip-preprocessor-directives t
+                      js2-strict-missing-semi-warning nil)
+                (add-hook 'js2-mode-hook 'emess-turn-on-smartparens)))
 
     (use-package "web-mode"
       :ensure t
