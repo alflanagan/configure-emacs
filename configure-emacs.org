@@ -4,8 +4,7 @@
 
 *** Introduction
 
-Emacs is a great editor. Actually, it is the One True Editor, the
-Platonic ideal of which all other editors are imperfect shadows.
+Emacs is a great editor.
 
 *** say "hello"
 #+begin_src emacs-lisp
@@ -22,10 +21,10 @@ the right thing for .org files that have embedded code sections.
   (defun emess-load-file (base)
     "Load file with name `base', checking multiple file extensions"
     (let* ((path  (expand-file-name base user-emacs-directory))
-	   (literate      (concat path ".org"))
-	   (encrypted-org (concat path ".org.gpg"))
-	   (plain         (concat path ".el"))
-	   (encrypted-el  (concat path ".el.gpg")))
+           (literate      (concat path ".org"))
+           (encrypted-org (concat path ".org.gpg"))
+           (plain         (concat path ".el"))
+           (encrypted-el  (concat path ".el.gpg")))
       (cond
        ((file-exists-p encrypted-org) (org-babel-load-file encrypted-org))
        ((file-exists-p encrypted-el)  (load encrypted-el))
@@ -33,6 +32,19 @@ the right thing for .org files that have embedded code sections.
        ((file-exists-p plain)         (load plain))
        (t (message "attempted to load %s, not found" literate)))))
 
+#+end_src
+
+** Make compiler happy
+
+These things usually get loaded by =init.el=, but the byte-compiler
+doesn't know that, does it?
+
+#+begin_src emacs-lisp
+  (eval-when-compile
+    (require 'package)
+    (setq package-selected-packages '(use-package))
+    (package-initialize)
+    nil)
 #+end_src
 
 ** Load secret data
@@ -62,7 +74,7 @@ heavy development, leaving it here for now.
       ;; \C-h h should be bound by package, and
       ;; hyperbole-web-search-alist is missing
       :config (setq hyperbole-web-search-alist nil))
-    
+
     ;; Manage and navigate projects in Emacs easily
     (use-package "projectile"
       :ensure t
@@ -162,7 +174,7 @@ heavy development, leaving it here for now.
       :config (progn
                 (require 'yasnippet)
                 (yas-global-mode 1)
-                (yas/load-directory (expand-file-name "snippets" user-emacs-directory)))))
+                (yas-load-directory (expand-file-name "snippets" user-emacs-directory)))))
 
   (define-key lisp-mode-shared-map (kbd "C-\\") 'completion-at-point)
   (define-key lisp-mode-shared-map (kbd "C-c v") 'eval-buffer)
@@ -219,9 +231,12 @@ Rgrep is infinitely useful in multi-file projects.
     "If you're saving an elisp file, likely the .elc is no longer valid."
     (make-local-variable 'after-save-hook)
     (add-hook 'after-save-hook
-	      (lambda ()
-		(if (file-exists-p (concat buffer-file-name "c"))
-		    (delete-file (concat buffer-file-name "c"))))))
+              (lambda ()
+                (if (file-exists-p (concat buffer-file-name "c"))
+                    (delete-file (concat buffer-file-name "c"))))))
+
+  (add-hook 'emess-coding-hook 'emess-remove-elc-on-save)
+
 #+end_src
 
 *** emacs-lisp-mode-hook
@@ -258,15 +273,19 @@ Rgrep is infinitely useful in multi-file projects.
 
   (add-hook 'prog-mode-hook 'emess-run-coding-hook)
 #+end_src
+
 ** Set up better default behavior
 
 #+begin_src emacs-lisp
   (emess-load-file (expand-file-name "better-emacs-defaults" user-emacs-directory))
 #+end_src
+
 ** Transparently open compressed files
+
 #+begin_src emacs-lisp
   (auto-compression-mode)
 #+end_src
+
 ** Highlight matching parentheses when the point is on them.
 
 #+begin_src emacs-lisp
@@ -274,28 +293,32 @@ Rgrep is infinitely useful in multi-file projects.
 #+end_src
 
 ** ido mode
+
 Set up ido-mode to add auto-completion to prompts, etc.
 #+begin_src emacs-lisp
   (when (> emacs-major-version 21)
     (ido-mode t)
     (setq ido-enable-prefix nil          ;; allow match to any part of name
-	  ido-enable-flex-matching t     ;; more flexible matches
-	  ido-create-new-buffer 'always  ;; create new buffer if no match?
-	  ido-use-filename-at-point nil  ;; use text at point as starter for filename selection
-	  ;; I find the above more annoying than helpful
-	  ido-max-prospects 10))
+          ido-enable-flex-matching t     ;; more flexible matches
+          ido-create-new-buffer 'always  ;; create new buffer if no match?
+          ido-use-filename-at-point nil  ;; use text at point as starter for filename selection
+          ;; I find the above more annoying than helpful
+          ido-max-prospects 10))
 #+end_src
+
 ** local and user customizations
 
 #+begin_src emacs-lisp
 
-  (defun remove-extension (name)
-    (string-match "\\(.*?\\)\.\\(org\\(\\.el\\)?\\|el\\)\\(\\.gpg\\)?$" name)
-    (match-string 1 name))
+  (defun emess-load-custom ()
+    "Load the local files =local.el= and =<username>.el=, if present."
+    (emess-load-file "local")
+    (emess-load-file user-login-name))
 
-  (emess-load-file "local")
-  (emess-load-file user-login-name)
+  (add-hook 'after-init-hook
+            'emess-load-custom)
 #+end_src
+
 ** Enable server mode
 
 This starts a background process running Emacs as a server, so that
@@ -310,5 +333,5 @@ However, I have had problems with the daemon not being able to open a
 frame.
 
 #+begin_src emacs-lisp
-  (server-start)
+  (add-hook 'after-init-hook 'server-start)
 #+end_src
