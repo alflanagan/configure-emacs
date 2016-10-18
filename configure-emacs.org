@@ -6,7 +6,7 @@
 
 Emacs is a great editor.
 
-*** say "hello"
+** say "hello"
 #+begin_src emacs-lisp
   (message "loaded configure-emacs")
 #+end_src
@@ -44,7 +44,18 @@ doesn't know that, does it?
     (require 'package)
     (setq package-selected-packages '(use-package))
     (package-initialize)
-    nil)
+    ;; undo-tree-mode, yas-load-directory, org-babel-do-load-languages
+    (declare-function projectile-mode "projectile" (&optional ARG))
+    (declare-function secret-data-get-key "secret-data" (SOME-KEY &optional FILE-NAME))
+    (declare-function undo-tree-mode "undo-tree" (&optional ARG))
+    (declare-function global-company-mode "company" (&optional ARG))
+    (declare-function smartparens-mode "smartparens" (&optional ARG))
+    (declare-function smartparens-strict-mode "smartparens" (&optional ARG))
+    (declare-function sp-use-paredit-bindings "smartparens" ())
+    (declare-function form-feed-mode "form-feed" (&optional ARG))
+    (declare-function yas-global-mode "yasnippet" (&optional ARG))
+    (declare-function yas-load-directory "yasnippet" (TOP-LEVEL-DIR &optional USE-JIT INTERACTIVE))
+    (declare-function org-babel-do-load-languages "org" (SYM VALUE)))
 #+end_src
 
 ** Load secret data
@@ -198,7 +209,11 @@ heavy development, leaving it here for now.
       :config (progn
                 (require 'yasnippet)
                 (yas-global-mode 1)
-                (yas-load-directory (expand-file-name "snippets" user-emacs-directory)))))
+                (yas-load-directory (expand-file-name "snippets" user-emacs-directory))))
+
+    (use-package "less-css-mode"
+      :ensure t
+      ))
 
   (define-key lisp-mode-shared-map (kbd "C-\\") 'completion-at-point)
   (define-key lisp-mode-shared-map (kbd "C-c v") 'eval-buffer)
