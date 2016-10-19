@@ -135,8 +135,6 @@ heavy development, leaving it here for now.
 
     (use-package "elpy"
       :ensure t
-      :mode "\\.pyw?\\'"
-      :interpreter "python[0-9.]*"
       :config (progn
                 (defun emess-set-up-elpy ()
                   (setq elpy-modules '(elpy-module-company elpy-module-eldoc elpy-module-flymake elpy-module-pyvenv
