@@ -1,3 +1,9 @@
+#+TITLE: Emacs Initialization and Setup
+#+AUTHOR: A. Lloyd Flanagan
+#+EMAIL: a.lloyd.flanagan@gmail.com
+#+PROPERTY: cache yes
+#+PROPERTY: tangle yes
+
 # Emacs Initialization and Setup
 
 ** A Primer And Example
@@ -7,7 +13,7 @@
 Emacs is a great editor.
 
 ** say "hello"
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp tangle: yes
   (message "loaded configure-emacs")
 #+end_src
 
@@ -44,7 +50,7 @@ doesn't know that, does it?
     (require 'package)
     (setq package-selected-packages '(use-package))
     (package-initialize)
-    ;; undo-tree-mode, yas-load-directory, org-babel-do-load-languages
+    ;; undo-tree-mode, yas-load-directory
     (declare-function projectile-mode "projectile" (&optional ARG))
     (declare-function secret-data-get-key "secret-data" (SOME-KEY &optional FILE-NAME))
     (declare-function undo-tree-mode "undo-tree" (&optional ARG))
@@ -54,8 +60,7 @@ doesn't know that, does it?
     (declare-function sp-use-paredit-bindings "smartparens" ())
     (declare-function form-feed-mode "form-feed" (&optional ARG))
     (declare-function yas-global-mode "yasnippet" (&optional ARG))
-    (declare-function yas-load-directory "yasnippet" (TOP-LEVEL-DIR &optional USE-JIT INTERACTIVE))
-    (declare-function org-babel-do-load-languages "org" (SYM VALUE)))
+    (declare-function yas-load-directory "yasnippet" (TOP-LEVEL-DIR &optional USE-JIT INTERACTIVE)))
 #+end_src
 
 ** Load secret data
@@ -111,9 +116,6 @@ heavy development, leaving it here for now.
     (use-package "async"
       :ensure t)
 
-    (use-package "org"
-      :ensure t)
-
     (use-package "paradox"
       :ensure t
       :config (setq paradox-github-token
@@ -133,6 +135,8 @@ heavy development, leaving it here for now.
 
     (use-package "elpy"
       :ensure t
+      :mode "\\.pyw?\\'"
+      :interpreter "python[0-9.]*"
       :config (progn
                 (defun emess-set-up-elpy ()
                   (setq elpy-modules '(elpy-module-company elpy-module-eldoc elpy-module-flymake elpy-module-pyvenv
@@ -149,11 +153,12 @@ heavy development, leaving it here for now.
 
     (use-package "js2-mode"
       :ensure t
+      :mode "\\.jsw?\\'"
+      :interpreter ("node" "rhino" "gjs" "nodejs")
       :init (progn
               (message "running :init for js-mode!!")
               (defun emess-fix-js2-alists ()
                 "Alter setup so that js2-mode is used instead of js-mode."
-                (emess-replace-cdrs interpreter-mode-alist 'js-mode 'js2-mode)
                 (emess-replace-cdrs auto-mode-alist 'javascript-mode 'js2-mode))
               (add-hook 'after-init-hook 'emess-fix-js2-alists))
         :config (progn
@@ -175,13 +180,12 @@ heavy development, leaving it here for now.
     (use-package "smartparens"
       :ensure t
       :config (progn
-                (defun emess-turn-on-smartparens ()
-                  (smartparens-mode +1)
+                (smartparens-global-mode)
+                (sp-use-paredit-bindings)
+                (defun emess-turn-on-sp-strict ()
                   ;; also emulate paredit's refusal to delete one delimiter in a pair
-                  (smartparens-strict-mode +1)
-                  ;; I find paredit bindings more convenient w/PC keyboards
-                  (sp-use-paredit-bindings))
-                (add-hook 'lisp-mode-hook 'emess-turn-on-smartparens)))
+                  (smartparens-strict-mode +1))
+                (add-hook 'lisp-mode-hook 'emess-turn-on-sp-strict)))
 
     (use-package "flx-ido"
       :ensure t)
@@ -236,27 +240,6 @@ Rgrep is infinitely useful in multi-file projects.
 
 #+begin_src emacs-lisp
   (define-key global-map "\C-x\C-r" 'rgrep)
-#+end_src
-
-** Set up org-babel supported languages
-
-#+begin_src emacs-lisp
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   '((C . t)
-     (clojure . t)
-     (css . t)
-     (emacs-lisp . t)
-     (js . t)
-     (lisp . t)
-     (org . t)
-     (python . t)
-     (R . t)
-     (ruby . t)
-     (sass . t)
-     (scheme . t)
-     (sh . t)
-     (sql . t)))
 #+end_src
 
 ** Emacs Lisp
@@ -343,6 +326,12 @@ Set up ido-mode to add auto-completion to prompts, etc.
           ido-use-filename-at-point nil  ;; use text at point as starter for filename selection
           ;; I find the above more annoying than helpful
           ido-max-prospects 10))
+#+end_src
+
+** Setup and options for Org Mode
+
+#+begin_src emacs-lisp
+  (emess-load-file (expand-file-name "configure-emacs-org" user-emacs-directory))
 #+end_src
 
 ** local and user customizations

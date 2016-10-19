@@ -1,11 +1,14 @@
-elpa
-*~
-network-security.data
 *.elc
+*~
 custom.el
-secret-data.el
-configure-emacs.el
-better-emacs-defaults.el
+elpa
+history
 ido.last
 local.*
+network-security.data
 projectile-bookmarks.*
+
+# tangled from .org files
+better-emacs-defaults.el
+configure-emacs*.el
+secret-data.el
