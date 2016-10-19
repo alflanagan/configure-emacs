@@ -57,15 +57,16 @@ encoding. So select it by default whenever possible.
 
 #+begin_src emacs-lisp
   (setq visible-bell t                      ;; try to flash the frame when a bell (warning beep) would sound.
-	echo-keystrokes 0.1                 ;; reduce lag in echo keystroke to screen
-	font-lock-maximum-decoration t      ;; use as much syntax highlighting as possible, by default
-	;; inhibit-startup-message t        ;; turn off Emacs splash screen
-	transient-mark-mode t               ;; visually highlight selected region
-	delete-by-moving-to-trash t         ;; use system trash can for deleted files
-	;; shift-select-mode nil            ;; disable selecting text by shift + motion command
-	truncate-partial-width-windows nil  ;; use value of `truncate_lines' even in windows narrower than frame
-	uniquify-buffer-name-style 'forward ;; label buffers for different files with the same name with enough bof file path to be unique
-	package-menu-hide-low-priority t    ;; don't show package in menu if higher-priority package is found
-	load-prefer-newer t)                ;; don't load .elc file if .el file is newer (well, duh)
+        echo-keystrokes 0.1                 ;; reduce lag in echo keystroke to screen
+        font-lock-maximum-decoration t      ;; use as much syntax highlighting as possible, by default
+        ;; inhibit-startup-message t        ;; turn off Emacs splash screen
+        transient-mark-mode t               ;; visually highlight selected region
+        delete-by-moving-to-trash t         ;; use system trash can for deleted files
+        ;; shift-select-mode nil            ;; disable selecting text by shift + motion command
+        truncate-partial-width-windows nil  ;; use value of `truncate_lines' even in windows narrower than frame
+        uniquify-buffer-name-style 'forward ;; label buffers for different files with the same name with enough bof file path to be unique
+        package-menu-hide-low-priority t    ;; don't show package in menu if higher-priority package is found
+        inhibit-startup-screen t            ;; don't display the splash screen. you can always use "C-h C-a".
+        load-prefer-newer t)                ;; don't load .elc file if .el file is newer (well, duh)
 
 #+end_src
