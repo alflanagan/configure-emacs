@@ -164,8 +164,7 @@ heavy development, leaving it here for now.
                 (message "mode for node interpreter is %s." (assq "node" interpreter-mode-alist))
                 (setq js2-include-node-externs t
                       js2-skip-preprocessor-directives t
-                      js2-strict-missing-semi-warning nil)
-                (add-hook 'js2-mode-hook 'emess-turn-on-smartparens)))
+                      js2-strict-missing-semi-warning nil)))
 
     (use-package "web-mode"
       :ensure t
@@ -215,7 +214,38 @@ heavy development, leaving it here for now.
 
     (use-package "less-css-mode"
       :ensure t
-      ))
+      )
+
+    (use-package "tern"   ;; Tern-powered JavaScript integration
+      :ensure t)
+
+    ;; comes with emacs, but get latest version from repo
+    (use-package "org" ;; Outline-based notes management and organizer
+      :ensure t)
+
+    ;; and get lots of extras for it
+    (use-package "org-plus-contrib" ;; all the org features not in Emacs distribution
+      :ensure t)
+    )
+
+  ;; clojure-mode         Major mode for Clojure code
+  ;; clojure-mode-extra-font-locking      Extra font-locking for Clojure mode
+  ;; company              Modular text completion framework
+  ;; company-tern         Tern backend for company-mode
+  ;; form-feed            Display ^L glyphs as horizontal lines
+  ;; git-commit           Edit Git commit messages
+  ;; jedi                 a Python auto-completion for Emacs
+  ;; json-mode            Major mode for editing JSON files
+  ;; less-css-mode        Major mode for editing LESS CSS files (lesscss.org)
+  ;; org-beautify-theme   A sub-theme to make org-mode more beautiful.
+  ;; org-elisp-help       org links to emacs-lisp documentation
+  ;; org-gnome            Orgmode integration with the GNOME desktop
+  ;; org-jira             Syncing between Jira and Org-mode.
+  ;; shrink-whitespace    Whitespace removal DWIM key
+  ;; slime                Superior Lisp Interaction Mode for Emacs
+  ;; undo-tree            Treat undo history as a tree
+  ;; web-beautify         Format HTML, CSS and JavaScript/JSON by js-beautify
+  ;; web-mode             major mode for editing web templates
 
   (define-key lisp-mode-shared-map (kbd "C-\\") 'completion-at-point)
   (define-key lisp-mode-shared-map (kbd "C-c v") 'eval-buffer)
