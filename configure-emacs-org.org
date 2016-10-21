@@ -14,8 +14,9 @@
 
 #+BEGIN_SRC emacs-lisp
   (defun emess-set-org-options ()
-    "Set multiple global options for happy Org mode." (setq org-babel-python-command "python3")
-    (setq org-babel-python-mode 'elpy)
+    "Set multiple global options for happy Org mode."
+    (setq org-babel-python-command "python3")
+    (setq org-babel-python-mode 'python-mode)
     (setq org-confirm-babel-evaluate nil)
     (setq org-export-backends '(ascii html icalendar latex md))
     (setq org-pretty-entities t)
@@ -37,27 +38,25 @@ The org-mode implementation included with Emacs is (intentionally)
 minimal. Get latest version and some extras from package system.
 
 #+BEGIN_SRC emacs-lisp
-  (use-package "org"
+  ;; comes with emacs, but get latest version from repo
+  (use-package "org" ;; Outline-based notes management and organizer
     :ensure t
     :config (emess-set-org-options))
 
-  (use-package "org-plus-contrib" ;; Outline-based notes management and organizer 
-    :ensure t
-    )
+  ;; and get lots of extras for it
+  (use-package "org-plus-contrib" ;; all the org features not in Emacs distribution
+    :ensure t)
 
   (use-package "org-beautify-theme"  ;; A sub-theme to make org-mode more beautiful. 
-    :ensure t
-    )
+    :ensure t)
 
   (use-package "org-elisp-help" ;; org links to emacs-lisp documentation 
-    :ensure t
-    )
+    :ensure t)
 
   (use-package "org-gnome" ;; Orgmode integration with the GNOME desktop 
     :if (string-match "gnome" (getenv "DESKTOP_SESSION"))
     :ensure t
     :config (setq global-org-gnome-minor-mode t)
     )
-
 #+END_SRC
 
