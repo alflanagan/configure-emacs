@@ -219,33 +219,18 @@ heavy development, leaving it here for now.
     (use-package "tern"   ;; Tern-powered JavaScript integration
       :ensure t)
 
-    ;; comes with emacs, but get latest version from repo
-    (use-package "org" ;; Outline-based notes management and organizer
+
+    (use-package "clojure-mode"  ;; Major mode for Clojure code
       :ensure t)
 
-    ;; and get lots of extras for it
-    (use-package "org-plus-contrib" ;; all the org features not in Emacs distribution
+    (use-package "clojure-mode-extra-font-locking"  ;; Extra font-locking for Clojure mode
       :ensure t)
-    )
 
-  ;; clojure-mode         Major mode for Clojure code
-  ;; clojure-mode-extra-font-locking      Extra font-locking for Clojure mode
-  ;; company              Modular text completion framework
-  ;; company-tern         Tern backend for company-mode
-  ;; form-feed            Display ^L glyphs as horizontal lines
-  ;; git-commit           Edit Git commit messages
-  ;; jedi                 a Python auto-completion for Emacs
-  ;; json-mode            Major mode for editing JSON files
-  ;; less-css-mode        Major mode for editing LESS CSS files (lesscss.org)
-  ;; org-beautify-theme   A sub-theme to make org-mode more beautiful.
-  ;; org-elisp-help       org links to emacs-lisp documentation
-  ;; org-gnome            Orgmode integration with the GNOME desktop
-  ;; org-jira             Syncing between Jira and Org-mode.
-  ;; shrink-whitespace    Whitespace removal DWIM key
-  ;; slime                Superior Lisp Interaction Mode for Emacs
-  ;; undo-tree            Treat undo history as a tree
-  ;; web-beautify         Format HTML, CSS and JavaScript/JSON by js-beautify
-  ;; web-mode             major mode for editing web templates
+    (use-package "json-mode" ;; Major mode for editing JSON files
+      :ensure t)
+
+    (use-package "company-tern" ;; Tern backend for company-mode
+      :ensure t))
 
   (define-key lisp-mode-shared-map (kbd "C-\\") 'completion-at-point)
   (define-key lisp-mode-shared-map (kbd "C-c v") 'eval-buffer)
@@ -352,7 +337,7 @@ Set up ido-mode to add auto-completion to prompts, etc.
           ido-enable-flex-matching t     ;; more flexible matches
           ido-create-new-buffer 'always  ;; create new buffer if no match?
           ido-use-filename-at-point nil  ;; use text at point as starter for filename selection
-          ;; I find the above more annoying than helpful
+          ;; I find the above feature more annoying than helpful
           ido-max-prospects 10))
 #+end_src
 
@@ -365,7 +350,6 @@ Set up ido-mode to add auto-completion to prompts, etc.
 ** local and user customizations
 
 #+begin_src emacs-lisp
-
   (defun emess-load-custom ()
     "Load the local files =local.el= and =<username>.el=, if present."
     (emess-load-file "local")
