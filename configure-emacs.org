@@ -37,7 +37,6 @@ the right thing for .org files that have embedded code sections.
        ((file-exists-p literate)      (org-babel-load-file literate))
        ((file-exists-p plain)         (load plain))
        (t (message "attempted to load %s, not found" literate)))))
-
 #+end_src
 
 ** Make compiler happy
@@ -137,11 +136,15 @@ heavy development, leaving it here for now.
       :ensure t
       :config (progn
                 (defun emess-set-up-elpy ()
-                  (setq elpy-modules '(elpy-module-company elpy-module-eldoc elpy-module-flymake elpy-module-pyvenv
-                                                           elpy-module-yasnippet elpy-module-sane-defaults)
+                  (setq elpy-modules '(elpy-module-company
+                                       elpy-module-eldoc
+                                       elpy-module-flymake
+                                       elpy-module-pyvenv
+                                       elpy-module-yasnippet
+                                       elpy-module-sane-defaults)
                         elpy-rpc-python-command "python3"
                         pyvenv-virtualenvwrapper-python "/usr/bin/python"))
-                (add-hook 'after-init-hook 'emess-set-up-elpy)
+                (emess-set-up-elpy)
                 (add-hook 'python-mode-hook 'elpy-mode)
                 (global-company-mode)))
 
@@ -155,11 +158,8 @@ heavy development, leaving it here for now.
       :interpreter ("node" "rhino" "gjs" "nodejs")
       :init (progn
               (message "running :init for js-mode!!")
-              (defun emess-fix-js2-alists ()
-                "Alter setup so that js2-mode is used instead of js-mode."
-                (emess-replace-cdrs auto-mode-alist 'javascript-mode 'js2-mode))
-              (add-hook 'after-init-hook 'emess-fix-js2-alists))
-        :config (progn
+              (emess-replace-cdrs auto-mode-alist 'javascript-mode 'js2-mode))
+      :config (progn 
                 (message "setting up js2-mode")
                 (message "mode for node interpreter is %s." (assq "node" interpreter-mode-alist))
                 (setq js2-include-node-externs t
@@ -276,14 +276,13 @@ Rgrep is infinitely useful in multi-file projects.
 
 *** emacs-lisp-mode-hook
 #+begin_src emacs-lisp
-  (add-hook 'emacs-lisp-mode-hook (lambda () (eldoc-mode +1)))
-  (add-hook 'emacs-lisp-mode-hook 'emess-remove-elc-on-save)
+  (defun emess-set-up-lisp ()
+    "Settings and initialization for `lisp-mode'."
+    (setq indent-tabs-mode nil) ;; for indentation, use spaces, not tabs
+    (lambda () (eldoc-mode +1)))
 
+  (add-hook 'emacs-lisp-mode-hook 'emess-set-up-lisp)
   ;; (define-key emacs-lisp-mode-map (kbd "C-c v") #'eval-buffer)
-  ;; for indentation, use spaces, not tabs
-  (defun emess-turn-off-indent-tabs ()
-    (setq indent-tabs-mode nil))
-  (add-hook 'emacs-lisp-mode-hook 'emess-turn-off-indent-tabs)
 #+end_src
 
 ** Configuration for each buffer
@@ -350,13 +349,8 @@ Set up ido-mode to add auto-completion to prompts, etc.
 ** local and user customizations
 
 #+begin_src emacs-lisp
-  (defun emess-load-custom ()
-    "Load the local files =local.el= and =<username>.el=, if present."
-    (emess-load-file "local")
-    (emess-load-file user-login-name))
-
-  (add-hook 'after-init-hook
-            'emess-load-custom)
+  (emess-load-file "local")
+  (emess-load-file user-login-name)
 #+end_src
 
 ** Enable server mode
@@ -373,5 +367,5 @@ However, I have had problems with the daemon not being able to open a
 frame.
 
 #+begin_src emacs-lisp
-  (add-hook 'after-init-hook 'server-start)
+  (server-start)
 #+end_src
