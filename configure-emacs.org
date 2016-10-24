@@ -222,8 +222,13 @@ heavy development, leaving it here for now.
       )
 
     (use-package "tern"   ;; Tern-powered JavaScript integration
-      :ensure t)
-
+      ;; note you must have tern installed!
+      ;; `sudo npm -g install tern`
+      :ensure t
+      :config (progn
+                (defun emess-turn-on-tern-mode ()
+                  (tern-mode t))
+                (add-hook 'js-mode-hook 'emess-turn-on-tern-mode)))
 
     (use-package "clojure-mode"  ;; Major mode for Clojure code
       :ensure t)
