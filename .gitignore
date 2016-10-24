@@ -12,3 +12,6 @@ projectile-bookmarks.*
 better-emacs-defaults.el
 configure-emacs*.el
 secret-data.el
+# cask, emacs package builder
+Cask
+.cask

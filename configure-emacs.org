@@ -168,6 +168,11 @@ heavy development, leaving it here for now.
 
     (use-package "web-mode"
       :ensure t
+      :config (progn
+                (defun emess-fix-web-alists ()
+                  "Alter setup so that web-mode is used instead of html-mode."
+                  (emess-replace-cdrs auto-mode-alist 'html-mode 'web-mode))
+                (add-hook 'after-init-hook 'emess-fix-web-alists))
       :defer)
 
     (use-package "web-beautify"
