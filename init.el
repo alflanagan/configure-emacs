@@ -11,6 +11,11 @@
         ("elpy" . "https://jorgenschaefer.github.io/packages/")
 	))
 
+;; the original idea of using priorities was to favor melpa-stable
+;; over melpa for a couple of packages.
+;; didn't realize how many packages were updating melpa regularly, but
+;; had not updated melpa-stable in a long time.
+
 ;; (setq package-archive-priorities
 ;;       '(("melpa-stable" . 20)
 ;;         ("marmalade" . 20)
