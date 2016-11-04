@@ -7,6 +7,17 @@
 ** Declare functions
 
 #+BEGIN_SRC emacs-lisp
+  (defvar org-babel-python-command)
+  (defvar org-babel-python-mode)
+  (defvar org-confirm-babel-evaluate)
+  (defvar org-export-backends)
+  (defvar org-pretty-entities)
+  (defvar org-src-fontify-natively)
+  (defvar org-src-tab-acts-natively)
+  (defvar org-babel-load-languages)
+  (defvar global-org-gnome-minor-mode)
+
+  (declare-function use-package "use-package" (NAME &rest ARGS))
   (declare-function org-babel-do-load-languages "org" (SYM VALUE))
 #+END_SRC
 
@@ -23,13 +34,13 @@
     (setq org-src-fontify-natively t)
     (setq org-src-tab-acts-natively t)
     (setq org-babel-load-languages
-          '((C . t)
-            (css . t)
-            (emacs-lisp . t)
-            (js . t)
-            (python . t)
-            (sh . t))))
-          
+	  '((C . t)
+	    (css . t)
+	    (emacs-lisp . t)
+	    (js . t)
+	    (python . t)
+	    (sh . t))))
+
 #+END_SRC
 
 ** Get Latest Org Mode from ELPA
@@ -39,24 +50,24 @@ minimal. Get latest version and some extras from package system.
 
 #+BEGIN_SRC emacs-lisp
   ;; comes with emacs, but get latest version from repo
-  (use-package "org" ;; Outline-based notes management and organizer
-    :ensure t
-    :config (emess-set-org-options))
-
   ;; and get lots of extras for it
+  ;; you never actually load "org-plus-contrib" -- it's a set of modules
+  ;; that can be loaded individually
   (use-package "org-plus-contrib" ;; all the org features not in Emacs distribution
+    :ensure t
+    :config (progn  (emess-set-org-options)
+		    (require 'org))
+    :defer)
+
+  (use-package "org-beautify-theme"  ;; A sub-theme to make org-mode more beautiful.
     :ensure t)
 
-  (use-package "org-beautify-theme"  ;; A sub-theme to make org-mode more beautiful. 
+  (use-package "org-elisp-help" ;; org links to emacs-lisp documentation
     :ensure t)
 
-  (use-package "org-elisp-help" ;; org links to emacs-lisp documentation 
-    :ensure t)
-
-  (use-package "org-gnome" ;; Orgmode integration with the GNOME desktop 
+  (use-package "org-gnome" ;; Orgmode integration with the GNOME desktop
     :if (string-match "gnome" (getenv "DESKTOP_SESSION"))
     :ensure t
     :config (setq global-org-gnome-minor-mode t)
     )
 #+END_SRC
-
