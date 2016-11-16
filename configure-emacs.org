@@ -251,14 +251,6 @@ heavy development, leaving it here for now.
 		(add-hook 'js-mode-hook 'emess-turn-on-tern-mode))
       :defer)
 
-    (use-package "clojure-mode"  ;; Major mode for Clojure code
-      :ensure t
-      :defer)
-
-    (use-package "clojure-mode-extra-font-locking"  ;; Extra font-locking for Clojure mode
-      :ensure t
-      :defer)
-
     (use-package "json-mode" ;; Major mode for editing JSON files
       :ensure t
       :defer)
@@ -380,6 +372,14 @@ Set up ido-mode to add auto-completion to prompts, etc.
 #+begin_src emacs-lisp
   (emess-load-file (expand-file-name "configure-emacs-org" user-emacs-directory))
 #+end_src
+
+** Setup and options for CIDER (Clojure)
+
+This needs a customization variable, probably a set of checkboxes to enable various subsystems.
+
+#+BEGIN_SRC emacs-lisp
+  (emess-load-file "configure-emacs-clojure")
+#+END_SRC
 
 ** local and user customizations
 

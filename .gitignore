@@ -15,3 +15,6 @@ secret-data.el
 # cask, emacs package builder
 Cask
 .cask
+semanticdb/
+bookmarks
+session.*
