@@ -101,7 +101,7 @@ heavy development, leaving it here for now.
     (use-package "hyperbole"
       :ensure t ;; if it's not installed, install it
       :bind (("C-M-RET" . assist-key)
-             ("C-h h" . hyperbole))
+	     ("C-h h" . hyperbole))
       ;; \C-h h should be bound by package, and
       ;; hyperbole-web-search-alist is missing
       :config (setq hyperbole-web-search-alist nil))
@@ -124,7 +124,8 @@ heavy development, leaving it here for now.
     (use-package "paradox"
       :ensure t
       :config (setq paradox-github-token
-                    (secret-data-get-key "paradox-github-token")))
+                    (secret-data-get-key "paradox-github-token")
+		    paradox-automatically-star nil))
 
     (use-package "shrink-whitespace"
       :ensure t)
@@ -144,11 +145,11 @@ heavy development, leaving it here for now.
 		(defun emess-set-up-elpy ()
                   ;; because I don't like highlight-indentation:
                   (setq elpy-modules '(elpy-module-company
-                                       elpy-module-eldoc
-                                       elpy-module-flymake
-                                       elpy-module-pyvenv
-                                       elpy-module-yasnippet
-                                       elpy-module-sane-defaults)
+				       elpy-module-eldoc
+				       elpy-module-flymake
+				       elpy-module-pyvenv
+				       elpy-module-yasnippet
+				       elpy-module-sane-defaults)
 			;; because I never use python 2 if I can help it
 			elpy-rpc-python-command "python3"
 			;; because elpy usually guesses this wrong (but
@@ -170,13 +171,13 @@ heavy development, leaving it here for now.
       :mode "\\.jsw?\\'"
       :interpreter ("node" "rhino" "gjs" "nodejs")
       :init (progn
-              (emess-replace-cdrs auto-mode-alist 'javascript-mode 'js2-mode))
+	      (emess-replace-cdrs auto-mode-alist 'javascript-mode 'js2-mode))
       :config (progn
 		(message "setting up js2-mode")
 		(message "mode for node interpreter is %s." (assq "node" interpreter-mode-alist))
 		(setq js2-include-node-externs t
-                      js2-skip-preprocessor-directives t
-                      js2-strict-missing-semi-warning nil)))
+		      js2-skip-preprocessor-directives t
+		      js2-strict-missing-semi-warning nil)))
 
     (use-package "web-mode"
       :ensure t
@@ -189,7 +190,24 @@ heavy development, leaving it here for now.
 
     (use-package "web-beautify"
       :ensure t
-      :defer)
+      :defer
+      :config (progn
+		(eval-after-load 'js2-mode
+                  (lambda ()
+		    (if (boundp 'js2-mode-map)
+			(define-key js2-mode-map (kbd "C-c b") 'web-beautify-js))))
+		(eval-after-load 'json-mode
+                  (lambda ()
+		    (if (boundp 'json-mode-map)
+			(define-key json-mode-map (kbd "C-c b") 'web-beautify-js))))
+		(eval-after-load 'sgml-mode
+                  (lambda ()
+		    (if (boundp 'html-mode-map)
+			(define-key html-mode-map (kbd "C-c b") 'web-beautify-html))))
+		(eval-after-load 'css-mode
+                  (lambda ()
+		    (if (boundp 'css-mode-map)
+			(define-key css-mode-map (kbd "C-c b") 'web-beautify-css))))))
 
     (use-package "smartparens"
       :ensure t
@@ -207,7 +225,7 @@ heavy development, leaving it here for now.
     (use-package "magit"
       :ensure t
       :bind (("C-x g" . magit-status)
-             ("C-x M-g" . magit-dispatch-popup))
+	     ("C-x M-g" . magit-dispatch-popup))
       :defer)
 
     (use-package "flycheck-pyflakes"
@@ -219,7 +237,7 @@ heavy development, leaving it here for now.
     (use-package "slime"
       :ensure t
       :init  (progn (setq inferior-lisp-program "/usr/bin/sbcl")
-                    (setq slime-contribs '(slime-fancy)))
+		    (setq slime-contribs '(slime-fancy)))
       :defer t)
 
     (use-package "form-feed"
@@ -341,6 +359,25 @@ Rgrep is infinitely useful in multi-file projects.
   (emess-load-file (expand-file-name "better-emacs-defaults" user-emacs-directory))
 #+end_src
 
+** My version of zap-to-char
+This version deletes chars up to but *not* including the character
+typed, which I find far more intuitive/useful.
+
+#+begin_src emacs-lisp
+  (defun zap-up-to-char (arg char)
+    "Kill up to but not including ARGth occurrence of CHAR.
+  Case is ignored if `case-fold-search' is non-nil in the current buffer.
+  Goes backward if ARG is negative; error if CHAR not found."
+    (interactive (list (prefix-numeric-value current-prefix-arg)
+                       (read-char "Zap up to char: " t)))
+    (kill-region (point) (progn
+                           (search-forward (char-to-string char) nil nil arg)
+                           (backward-char (cl-signum arg))
+                           (point))))
+
+  (global-set-key "\M-z" #'zap-up-to-char)
+#+end_src
+
 ** Transparently open compressed files
 
 #+begin_src emacs-lisp
@@ -381,6 +418,19 @@ This needs a customization variable, probably a set of checkboxes to enable vari
   (emess-load-file "configure-emacs-clojure")
 #+END_SRC
 
+** Forth setup
+This should be a modular file, but for now this will do. We use the
+forth-mode implementation that comes with [[https://www.gnu.org/software/gforth/][Gforth]]. Just copy
+=gforth.el= and =gforth-init.el= to the =src= subdirectory.
+
+#+BEGIN_SRC emacs-lisp
+  (let* ((fname (expand-file-name "src/gforth-init" user-emacs-directory))
+	 (el-name (concat fname ".el")))
+    (if (file-exists-p el-name)
+	(emess-load-file fname)
+      (message "not found: %s" el-name)))
+#+END_SRC
+
 ** local and user customizations
 
 #+begin_src emacs-lisp
@@ -402,5 +452,16 @@ However, I have had problems with the daemon not being able to open a
 frame.
 
 #+begin_src emacs-lisp
-  (server-start)
+  (require 'server)
+  (defun start-server-if-none ()
+    "Start the server processes, unless another process already has."
+    ;; test copied from server.el
+    (let ((file (expand-file-name "server"
+                                  (if server-use-tcp
+                                      server-auth-dir
+                                    server-socket-dir))))
+      (if (not (file-exists-p file))
+          (server-start))))
+  (start-server-if-none)
+
 #+end_src
