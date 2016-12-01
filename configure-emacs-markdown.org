@@ -1,0 +1,15 @@
+# Markdown processing
+
+`vmd-mode` is a nifty mode that shows a preview of a markdown file,
+updating it as you edit. It requires a separate program called `vmd`,
+which can be installed with the Node package manager.
+
+
+#+BEGIN_SRC emacs-lisp
+  (use-package "markdown-mode"
+    :ensure t
+    :defer t)
+  (use-package "vmd-mode"
+    :ensure t
+    :defer t)
+#+END_SRC

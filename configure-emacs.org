@@ -429,6 +429,10 @@ forth-mode implementation that comes with [[https://www.gnu.org/software/gforth/
     (if (file-exists-p el-name)
 	(emess-load-file fname)
       (message "not found: %s" el-name)))
+** Setup and options for Markdown
+
+#+BEGIN_SRC emacs-lisp
+  (emess-load-file "configure-emacs-markdown")
 #+END_SRC
 
 ** local and user customizations
