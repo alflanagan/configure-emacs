@@ -168,16 +168,16 @@ heavy development, leaving it here for now.
 
     (use-package "js2-mode"
       :ensure t
-      :mode "\\.jsw?\\'"
+      :mode ("\\.jsw?\\'" "\\.jsm?\\'" "\\.es[5678]\\'")
       :interpreter ("node" "rhino" "gjs" "nodejs")
-      :init (progn
-	      (emess-replace-cdrs auto-mode-alist 'javascript-mode 'js2-mode))
       :config (progn
 		(message "setting up js2-mode")
-		(message "mode for node interpreter is %s." (assq "node" interpreter-mode-alist))
+		(message "mode for node interpreter is %s." (cdr (assoc-string "node" interpreter-mode-alist)))
 		(setq js2-include-node-externs t
-		      js2-skip-preprocessor-directives t
-		      js2-strict-missing-semi-warning nil)))
+		      js2-strict-missing-semi-warning nil
+		      js-enabled-frameworks '(javascript)
+		      js-indent-level 2)
+		(add-hook 'js2-mode-hook (lambda () (tern-mode t)))))
 
     (use-package "web-mode"
       :ensure t
@@ -263,10 +263,6 @@ heavy development, leaving it here for now.
       ;; note you must have tern installed!
       ;; `sudo npm -g install tern`
       :ensure t
-      :config (progn
-		(defun emess-turn-on-tern-mode ()
-                  (tern-mode t))
-		(add-hook 'js-mode-hook 'emess-turn-on-tern-mode))
       :defer)
 
     (use-package "json-mode" ;; Major mode for editing JSON files
@@ -433,6 +429,18 @@ forth-mode implementation that comes with [[https://www.gnu.org/software/gforth/
 
 #+BEGIN_SRC emacs-lisp
   (emess-load-file "configure-emacs-markdown")
+#+END_SRC
+
+** Setup and options for Javascript
+
+We set up `js2-mode` to automatically turn on tern mode. However,
+plain `js-mode` is built in. We don't set this up in `tern`'s
+`use-package` declaration because it uses deferred loading, and we
+want to turn on `tern-mode` for javascript even if it hasn't loaded
+yet. So,
+
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'js-mode-hook (lambda () (tern-mode t)))
 #+END_SRC
 
 ** local and user customizations
