@@ -177,7 +177,9 @@ heavy development, leaving it here for now.
 		      js2-strict-missing-semi-warning nil
 		      js-enabled-frameworks '(javascript)
 		      js-indent-level 2)
-		(add-hook 'js2-mode-hook (lambda () (tern-mode t)))))
+		(add-hook 'js2-mode-hook (lambda () 
+                                           (tern-mode t)
+                                           (setq indent-tabs-mode nil)))))
 
     (use-package "web-mode"
       :ensure t
