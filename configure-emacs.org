@@ -129,7 +129,8 @@ heavy development, leaving it here for now.
       :ensure t
       :config (setq paradox-github-token
                     (secret-data-get-key "paradox-github-token")
-                    paradox-automatically-star nil))
+                    paradox-automatically-star nil)
+      :defer)
 
     (use-package "shrink-whitespace" ;; Whitespace removal DWIM key
       :ensure t)
@@ -183,7 +184,8 @@ heavy development, leaving it here for now.
                       js-indent-level 2)
 		(add-hook 'js2-mode-hook (lambda ()
                                            (tern-mode t)
-                                           (setq indent-tabs-mode nil)))))
+                                           (setq indent-tabs-mode nil))))
+      :defer)
 
     (use-package "web-mode" ;; major mode for editing web templates
       :ensure t
@@ -245,8 +247,8 @@ heavy development, leaving it here for now.
     ;; there are versions in marmalade but they're way old
     (use-package "slime" ;; Superior Lisp Interaction Mode for Emacs
       :ensure t
-      :init  (progn (setq inferior-lisp-program "/usr/bin/sbcl")
-                    (setq slime-contribs '(slime-fancy)))
+      :config (progn (setq inferior-lisp-program "/usr/bin/sbcl")
+                     (setq slime-contribs '(slime-fancy)))
       :defer t)
 
     (use-package "form-feed" ;; Display ^L glyphs as horizontal lines
@@ -264,6 +266,7 @@ heavy development, leaving it here for now.
 
     (use-package "less-css-mode" ;; Major mode for editing LESS CSS files (lesscss.org)
       :ensure t
+      ;; :mode ("\\.less\\'" . less-css-mode) ;; mode sets this up in autoload
       :defer
       )
 
