@@ -18,3 +18,5 @@ Cask
 semanticdb/
 bookmarks
 session.*
+# gforth files from gforth repo
+src/gforth*
