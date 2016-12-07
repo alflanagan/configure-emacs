@@ -4,8 +4,9 @@
 updating it as you edit. It requires a separate program called `vmd`,
 which can be installed with the Node package manager.
 
-
 #+BEGIN_SRC emacs-lisp
+  (declare-function use-package "use-package" (NAME &rest ARGS))
+
   (use-package "markdown-mode"
     :ensure t
     :defer t)

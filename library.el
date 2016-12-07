@@ -1,4 +1,9 @@
 ;; library.el -- generally useful functions -*- lexical-binding: t -*-
+(require 'cl-lib)
+
+(defun do-some-magic ()
+  "This is just a placeholder for some code I haven't figured out yet."
+  )
 
 (defun assoc-keys-for-values (alist value &optional test)
   "Return a list of all keys in ALIST for which (TEST key VALUE) is 't'. TEST defaults to `equal'."
@@ -24,9 +29,9 @@
      (invert-alist (cdr alist)))))
 
 (defun do-library-tests ()
-  (assert (equal (assoc-keys-for-values '((1 . 2)(3 . 4)(4 . 2)(5 . 6)) 2) '(1 4)))
-  (assert (equal (assoc-keys-for-values '(()) 3 'eql) nil))
-  (assert (equal (assoc-keys-for-values '((1 . (1 2))(3 . 4)(4 . 2)(5 . 6)) '(1 2)) '(1)))
-  (assert (equal (assoc-keys-for-values '((1 . (1 2))(3 . 4)(4 . 2)(5 . 6)) '(1 2) 'eql) nil)))
+  (cl-assert (equal (assoc-keys-for-values '((1 . 2)(3 . 4)(4 . 2)(5 . 6)) 2) '(1 4)))
+  (cl-assert (equal (assoc-keys-for-values '(()) 3 'eql) nil))
+  (cl-assert (equal (assoc-keys-for-values '((1 . (1 2))(3 . 4)(4 . 2)(5 . 6)) '(1 2)) '(1)))
+  (cl-assert (equal (assoc-keys-for-values '((1 . (1 2))(3 . 4)(4 . 2)(5 . 6)) '(1 2) 'eql) nil)))
 
 (do-library-tests)

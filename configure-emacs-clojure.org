@@ -1,6 +1,8 @@
 # Clojure Editing
 
 #+BEGIN_SRC emacs-lisp
+  (declare-function use-package "use-package" (NAME &rest ARGS))
+
   (use-package "cider"
     :ensure t
     :defer)

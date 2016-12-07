@@ -49,8 +49,8 @@ doesn't know that, does it?
     (require 'package)
     (setq package-selected-packages '(use-package))
     (package-initialize)
-    ;; undo-tree-mode, yas-load-directory
     (declare-function projectile-mode "projectile" (&optional ARG))
+    (declare-function emess-set-up-elpy "configure-emacs" ())
     (declare-function secret-data-get-key "secret-data" (SOME-KEY &optional FILE-NAME))
     (declare-function undo-tree-mode "undo-tree" (&optional ARG))
     (declare-function global-company-mode "company" (&optional ARG))
@@ -59,7 +59,10 @@ doesn't know that, does it?
     (declare-function sp-use-paredit-bindings "smartparens" ())
     (declare-function form-feed-mode "form-feed" (&optional ARG))
     (declare-function yas-global-mode "yasnippet" (&optional ARG))
-    (declare-function yas-load-directory "yasnippet" (TOP-LEVEL-DIR &optional USE-JIT INTERACTIVE)))
+    (declare-function tern-mode "tern" (&optional arg))
+    (declare-function smartparens-global-mode "smartparens" (&optional arg))
+    ;; for unknown reason, still get error about yas-load-directory on compile
+    (declare-function yas-load-directory "yasnippet" (top-level-dir &optional use-jit interactive)))
 #+end_src
 
 ** Load secret data
@@ -98,10 +101,11 @@ heavy development, leaving it here for now.
     "Use `use-package' to install other desired packages."
 
     ;; GNU Hyperbole: The Everyday Hypertextual Information Manager
+    ;; contains a number of useful functions usable anywhere
     (use-package "hyperbole"
       :ensure t ;; if it's not installed, install it
       :bind (("C-M-RET" . assist-key)
-	     ("C-h h" . hyperbole))
+             ("C-h h" . hyperbole))
       ;; \C-h h should be bound by package, and
       ;; hyperbole-web-search-alist is missing
       :config (setq hyperbole-web-search-alist nil))
@@ -115,22 +119,22 @@ heavy development, leaving it here for now.
     (use-package "sr-speedbar"
       :ensure t)
 
-    (use-package "projectile-speedbar"
+    (use-package "projectile-speedbar" ;; speedbar integration for projectile
       :ensure t)
 
-    (use-package "async"
+    (use-package "async" ;; Asynchronous processing in Emacs
       :ensure t)
 
-    (use-package "paradox"
+    (use-package "paradox" ;; A modern Packages Menu. Colored, with package ratings, and customizable.
       :ensure t
       :config (setq paradox-github-token
                     (secret-data-get-key "paradox-github-token")
-		    paradox-automatically-star nil))
+                    paradox-automatically-star nil))
 
-    (use-package "shrink-whitespace"
+    (use-package "shrink-whitespace" ;; Whitespace removal DWIM key
       :ensure t)
 
-    (use-package "undo-tree"
+    (use-package "undo-tree" ;; Treat undo history as a tree
       :ensure t
       :config (progn
 		(defun turn-on-undo-tree ()
@@ -139,17 +143,17 @@ heavy development, leaving it here for now.
 		(add-hook 'prog-mode-hook 'turn-on-undo-tree)
 		(add-hook 'org-mode-hook 'turn-on-undo-tree)))
 
-    (use-package "elpy"
+    (use-package "elpy" ;; Emacs Python Development Environment
       :ensure t
       :config (progn
 		(defun emess-set-up-elpy ()
                   ;; because I don't like highlight-indentation:
                   (setq elpy-modules '(elpy-module-company
-				       elpy-module-eldoc
-				       elpy-module-flymake
-				       elpy-module-pyvenv
-				       elpy-module-yasnippet
-				       elpy-module-sane-defaults)
+                                       elpy-module-eldoc
+                                       elpy-module-flymake
+                                       elpy-module-pyvenv
+                                       elpy-module-yasnippet
+                                       elpy-module-sane-defaults)
 			;; because I never use python 2 if I can help it
 			elpy-rpc-python-command "python3"
 			;; because elpy usually guesses this wrong (but
@@ -162,11 +166,11 @@ heavy development, leaving it here for now.
       :init (add-hook 'python-mode-hook 'elpy-mode)
       :defer)
 
-    (use-package "jedi"
+    (use-package "jedi" ;; a Python auto-completion for Emacs
       :ensure t
       :defer)
 
-    (use-package "js2-mode"
+    (use-package "js2-mode" ;; Improved JavaScript editing mode
       :ensure t
       :mode ("\\.jsw?\\'" "\\.jsm?\\'" "\\.es[5678]\\'")
       :interpreter ("node" "rhino" "gjs" "nodejs")
@@ -174,14 +178,14 @@ heavy development, leaving it here for now.
 		(message "setting up js2-mode")
 		(message "mode for node interpreter is %s." (cdr (assoc-string "node" interpreter-mode-alist)))
 		(setq js2-include-node-externs t
-		      js2-strict-missing-semi-warning nil
-		      js-enabled-frameworks '(javascript)
-		      js-indent-level 2)
-		(add-hook 'js2-mode-hook (lambda () 
+                      js2-strict-missing-semi-warning nil
+                      js-enabled-frameworks '(javascript)
+                      js-indent-level 2)
+		(add-hook 'js2-mode-hook (lambda ()
                                            (tern-mode t)
                                            (setq indent-tabs-mode nil)))))
 
-    (use-package "web-mode"
+    (use-package "web-mode" ;; major mode for editing web templates
       :ensure t
       :config (progn
 		(defun emess-fix-web-alists ()
@@ -190,28 +194,30 @@ heavy development, leaving it here for now.
 		(add-hook 'after-init-hook 'emess-fix-web-alists))
       :defer)
 
-    (use-package "web-beautify"
+    (use-package "web-beautify" ;; Format HTML, CSS and JavaScript/JSON
+     ;; requires node package js-beautify, which by itself is a good
+     ;; reason to install node on your machine.
       :ensure t
       :defer
       :config (progn
 		(eval-after-load 'js2-mode
                   (lambda ()
-		    (if (boundp 'js2-mode-map)
+                    (if (boundp 'js2-mode-map)
 			(define-key js2-mode-map (kbd "C-c b") 'web-beautify-js))))
 		(eval-after-load 'json-mode
                   (lambda ()
-		    (if (boundp 'json-mode-map)
+                    (if (boundp 'json-mode-map)
 			(define-key json-mode-map (kbd "C-c b") 'web-beautify-js))))
 		(eval-after-load 'sgml-mode
                   (lambda ()
-		    (if (boundp 'html-mode-map)
+                    (if (boundp 'html-mode-map)
 			(define-key html-mode-map (kbd "C-c b") 'web-beautify-html))))
 		(eval-after-load 'css-mode
                   (lambda ()
-		    (if (boundp 'css-mode-map)
+                    (if (boundp 'css-mode-map)
 			(define-key css-mode-map (kbd "C-c b") 'web-beautify-css))))))
 
-    (use-package "smartparens"
+    (use-package "smartparens" ;; Automatic insertion, wrapping and paredit-like navigation with user defined pairs.
       :ensure t
       :config (progn
 		(smartparens-global-mode)
@@ -221,42 +227,42 @@ heavy development, leaving it here for now.
                   (smartparens-strict-mode +1))
 		(add-hook 'lisp-mode-hook 'emess-turn-on-sp-strict)))
 
-    (use-package "flx-ido"
+    (use-package "flx-ido" ;; flx integration for ido
+      ;; flx: fuzzy matching with good sorting
       :ensure t)
 
-    (use-package "magit"
+    (use-package "magit" ;; A Git porcelain inside Emacs
       :ensure t
       :bind (("C-x g" . magit-status)
-	     ("C-x M-g" . magit-dispatch-popup))
+             ("C-x M-g" . magit-dispatch-popup))
       :defer)
 
-    (use-package "flycheck-pyflakes"
+    (use-package "flycheck-pyflakes" ;; Support pyflakes in flycheck (on-the-fly syntax checking)
       :ensure t
       :defer)
 
     ;; slime and all slime-* packages need to come from melpa
     ;; there are versions in marmalade but they're way old
-    (use-package "slime"
+    (use-package "slime" ;; Superior Lisp Interaction Mode for Emacs
       :ensure t
       :init  (progn (setq inferior-lisp-program "/usr/bin/sbcl")
-		    (setq slime-contribs '(slime-fancy)))
+                    (setq slime-contribs '(slime-fancy)))
       :defer t)
 
-    (use-package "form-feed"
+    (use-package "form-feed" ;; Display ^L glyphs as horizontal lines
       :ensure t
       :config (progn
 		(defun emess-form-feed-turn-on ()
                   (form-feed-mode 1))
 		(add-hook 'emacs-lisp-mode-hook 'emess-form-feed-turn-on)))
 
-    (use-package "yasnippet"
+    (use-package "yasnippet" ;; Yet another snippet extension for Emacs.
       :ensure t
       :config (progn
-		(require 'yasnippet)
 		(yas-global-mode 1)
-		(yas-load-directory (expand-file-name "snippets" user-emacs-directory))))
+		(yas-load-directory (expand-file-name "snippets" user-emacs-directory) t)))
 
-    (use-package "less-css-mode"
+    (use-package "less-css-mode" ;; Major mode for editing LESS CSS files (lesscss.org)
       :ensure t
       :defer
       )
@@ -272,6 +278,10 @@ heavy development, leaving it here for now.
       :defer)
 
     (use-package "company-tern" ;; Tern backend for company-mode
+      :ensure t
+      :defer)
+
+    (use-package "emr" ;; Emacs refactoring system
       :ensure t
       :defer))
 
@@ -423,9 +433,9 @@ forth-mode implementation that comes with [[https://www.gnu.org/software/gforth/
 
 #+BEGIN_SRC emacs-lisp
   (let* ((fname (expand-file-name "src/gforth-init" user-emacs-directory))
-	 (el-name (concat fname ".el")))
+         (el-name (concat fname ".el")))
     (if (file-exists-p el-name)
-	(emess-load-file fname)
+        (emess-load-file fname)
       (message "not found: %s" el-name)))
 #+END_SRC
 
@@ -481,3 +491,7 @@ frame.
   (start-server-if-none)
 
 #+end_src
+
+# Local Variables:
+# indent-tabs-mode: nil
+# End:

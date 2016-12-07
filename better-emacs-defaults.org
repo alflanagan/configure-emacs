@@ -56,6 +56,8 @@ encoding. So select it by default whenever possible.
 ** Various global settings
 
 #+begin_src emacs-lisp
+  (defvar package-menu-hide-low-priority)
+
   (setq visible-bell t                      ;; try to flash the frame when a bell (warning beep) would sound.
         echo-keystrokes 0.1                 ;; reduce lag in echo keystroke to screen
         font-lock-maximum-decoration t      ;; use as much syntax highlighting as possible, by default
@@ -70,3 +72,7 @@ encoding. So select it by default whenever possible.
         load-prefer-newer t)                ;; don't load .elc file if .el file is newer (well, duh)
 
 #+end_src
+
+# Local Variables:
+# indent-tabs-mode: nil
+# End:
