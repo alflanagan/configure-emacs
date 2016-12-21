@@ -20,3 +20,4 @@ bookmarks
 session.*
 # gforth files from gforth repo
 src/gforth*
+ac-comphist.dat

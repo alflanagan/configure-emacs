@@ -1,0 +1,39 @@
+#+TITLE: PHP Initialization and Setup
+#+AUTHOR: A. Lloyd Flanagan
+#+EMAIL: a.lloyd.flanagan@gmail.com
+#+PROPERTY: cache yes
+#+PROPERTY: tangle yes
+
+Some of us are forced to work with PHP even though we'd much rather
+not. ;-) For those poor souls there's `php-mode` and some handy
+extras.
+
+#+BEGIN_SRC emacs-lisp
+  ;; note there is a `php+-mode` but it was last updated in 2012
+  (use-package "php-mode"  ;; Major mode for editing PHP code 
+    :ensure t
+    :defer)
+
+  (use-package "php-eldoc"  ;; eldoc backend for php 
+    :ensure t
+    :defer
+    :config (add-hook 'php-init-hook (lambda ()
+                                       (enable-php-eldoc)
+                                       (eldoc-mode 1))))
+
+  (use-package "php-extras"  ;; Extra features for `php-mode'
+    :ensure t
+    :defer
+    )
+
+  (use-package "php-refactor-mode"
+    ;; Minor mode to quickly and safely perform common refactorings
+    :ensure t
+    :defer)
+
+  (use-package "php-scratch"
+    ;; A scratch buffer to interactively evaluate php code
+    :ensure t
+    :defer)
+
+#+END_SRC
