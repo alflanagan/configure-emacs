@@ -29,7 +29,7 @@
 ;; add an extra directory to load path, so .emacs.d doesn't get even
 ;; more crowded.
 (add-to-list 'load-path (expand-file-name "src" user-emacs-directory))
-;; (add-to-list 'load-path (expand-file-name "use-package" user-emacs-directory))
+(add-to-list 'load-path (expand-file-name "use-package" user-emacs-directory))
 
 ;; (setq package-selected-packages '(use-package))
 
