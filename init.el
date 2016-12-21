@@ -41,10 +41,16 @@
 
 (package-refresh-contents t)
 
+(eval-when-compile
+  (add-to-list 'load-path (expand-file-name "use-package" user-emacs-directory))
+  (require 'use-package))
+
 (defun load-everything ()
   "Loads and executes =configure-emacs.org= file."
   (require 'use-package)
   (require 'org)
+  ;; (setq use-package-debug t)
+  ;; (setq use-package-verbose 'debug)
 
   (org-babel-load-file
    (expand-file-name "configure-emacs.org" user-emacs-directory)))

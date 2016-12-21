@@ -47,7 +47,8 @@ doesn't know that, does it?
 #+begin_src emacs-lisp
   (eval-when-compile
     (require 'package)
-    (setq package-selected-packages '(use-package))
+    (add-to-list 'load-path (expand-file-name "use-package" user-emacs-directory))
+    (require 'use-package)
     (package-initialize)
     (declare-function projectile-mode "projectile" (&optional ARG))
     (declare-function emess-set-up-elpy "configure-emacs" ())
