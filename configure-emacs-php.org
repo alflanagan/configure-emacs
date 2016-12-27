@@ -1,8 +1,19 @@
-#+TITLE: PHP Initialization and Setup
+n#+TITLE: PHP Initialization and Setup
 #+AUTHOR: A. Lloyd Flanagan
 #+EMAIL: a.lloyd.flanagan@gmail.com
 #+PROPERTY: cache yes
 #+PROPERTY: tangle yes
+
+** Declarations
+
+Tell byte-compiler about functions it might see.
+
+#+BEGIN_SRC emacs-lisp
+  (declare-function php-eldoc-enable "php-eldoc" ())
+  (declare-function use-package "use-package" (name &rest args))
+#+END_SRC
+
+** Load Packages
 
 Some of us are forced to work with PHP even though we'd much rather
 not. ;-) For those poor souls there's `php-mode` and some handy
@@ -18,13 +29,12 @@ extras.
     :ensure t
     :defer
     :config (add-hook 'php-init-hook (lambda ()
-                                       (enable-php-eldoc)
+                                       (php-eldoc-enable)
                                        (eldoc-mode 1))))
 
   (use-package "php-extras"  ;; Extra features for `php-mode'
     :ensure t
-    :defer
-    )
+    :defer)
 
   (use-package "php-refactor-mode"
     ;; Minor mode to quickly and safely perform common refactorings

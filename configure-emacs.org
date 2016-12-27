@@ -50,6 +50,7 @@ doesn't know that, does it?
     (add-to-list 'load-path (expand-file-name "use-package" user-emacs-directory))
     (require 'use-package)
     (package-initialize)
+    (declare-function use-package "use-package" (name &rest args))
     (declare-function projectile-mode "projectile" (&optional ARG))
     (declare-function emess-set-up-elpy "configure-emacs" ())
     (declare-function secret-data-get-key "secret-data" (SOME-KEY &optional FILE-NAME))
