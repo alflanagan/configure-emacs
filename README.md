@@ -15,3 +15,7 @@ Goals are:
    2. The second part is the modules themselves. Each one is focused on a narrow set of tasks, such as setting up a particular mode or handling a particular file extension.
 
 2. Use .org files and literate programming to extensively document both the infrastructure and the modules. This is crucial to making the project useful for newcomers.
+
+# Archived
+
+As I'm no longer using Emacs as my general-purpose editor, this has not been maintained in some time.
